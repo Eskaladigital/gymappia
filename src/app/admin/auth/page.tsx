@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-export default function AdminAuthRedirect() {
+function AdminAuthRedirectInner() {
   const params = useSearchParams()
 
   useEffect(() => {
@@ -15,5 +15,17 @@ export default function AdminAuthRedirect() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-4xl animate-bounce">💪</div>
     </div>
+  )
+}
+
+export default function AdminAuthRedirect() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-4xl animate-bounce">💪</div>
+      </div>
+    }>
+      <AdminAuthRedirectInner />
+    </Suspense>
   )
 }
