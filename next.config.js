@@ -10,7 +10,7 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   reactStrictMode: true,
   async rewrites() {
-    return [{ source: '/favicon.ico', destination: '/icons/icon-192x192.png' }]
+    return [{ source: '/favicon.ico', destination: '/icons/icon-512x512.png' }]
   },
 }
 

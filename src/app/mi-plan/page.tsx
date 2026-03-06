@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { LayoutDashboard } from 'lucide-react'
+import { Logo } from '@/components/Logo'
 import { createClient } from '@/lib/supabase/client'
 import type { TrainingPlan, ClientProfile, UserStats, WorkoutDay, SessionLog } from '@/types'
 
@@ -378,11 +379,11 @@ function MiPlanContent() {
 
       {/* Header PACGYM */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <span className="text-lg font-black" style={{ fontFamily: 'Syne, sans-serif' }}>
-            PAC<span className="text-brand-400">GYM</span>
-          </span>
-          <p className="text-slate-500 text-xs">Hola, {client?.nombre?.split(' ')[0] || 'Usuario'} 👋</p>
+        <div className="flex items-center gap-3">
+          <Logo size={40} />
+          <div>
+            <p className="text-slate-500 text-xs">Hola, {client?.nombre?.split(' ')[0] || 'Usuario'} 👋</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           {isAdmin && (
