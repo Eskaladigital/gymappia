@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { LayoutDashboard } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { TrainingPlan, ClientProfile, UserStats, WorkoutDay, SessionLog } from '@/types'
 
@@ -24,6 +25,7 @@ function MiPlanContent() {
 
   const [client, setClient] = useState<ClientProfile | null>(null)
   const [plan, setPlan] = useState<TrainingPlan | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [stats, setStats] = useState<UserStats | null>(null)
   const [logs, setLogs] = useState<SessionLog[]>([])
   const [activeWeek, setActiveWeek] = useState(1)
@@ -82,10 +84,13 @@ function MiPlanContent() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [clientRes, statsRes] = await Promise.all([
+    const [profileRes, clientRes, statsRes] = await Promise.all([
+      supabase.from('profiles').select('role').eq('id', user.id).single(),
       supabase.from('clients').select('*').eq('user_id', user.id).single(),
       supabase.from('user_stats').select('*').eq('user_id', user.id).single(),
     ])
+
+    if (profileRes.data?.role === 'admin') setIsAdmin(true)
 
     if (clientRes.data) {
       setClient(clientRes.data)
@@ -377,11 +382,18 @@ function MiPlanContent() {
           <span className="text-lg font-black" style={{ fontFamily: 'Syne, sans-serif' }}>
             PAC<span className="text-brand-400">GYM</span>
           </span>
-          <p className="text-slate-500 text-xs">Hola, {client?.nombre?.split(' ')[0]} 👋</p>
+          <p className="text-slate-500 text-xs">Hola, {client?.nombre?.split(' ')[0] || 'Usuario'} 👋</p>
         </div>
-        <div className="text-right">
-          <p className="text-brand-400 font-black text-xl">{stats?.puntos_totales || 0}</p>
-          <p className="text-xs text-slate-500">puntos</p>
+        <div className="flex items-center gap-3">
+          {isAdmin && (
+            <Link href="/admin" className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-500/30 hover:bg-brand-500/30 text-brand-400 transition-colors" title="Panel de control">
+              <LayoutDashboard size={20} />
+            </Link>
+          )}
+          <div className="text-right">
+            <p className="text-brand-400 font-black text-xl">{stats?.puntos_totales || 0}</p>
+            <p className="text-xs text-slate-500">puntos</p>
+          </div>
         </div>
       </div>
 

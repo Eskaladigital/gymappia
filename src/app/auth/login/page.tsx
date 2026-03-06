@@ -1,42 +1,55 @@
 'use client'
 
-import { Suspense, useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Eye, EyeOff } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 function LoginContent() {
-  const router = useRouter()
   const params = useSearchParams()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const redirect = params.get('redirect') || '/mi-plan'
+  const errorMsg = params.get('msg')
+  const hasError = error || params.get('error') === 'auth' || errorMsg
 
-  useEffect(() => {
-    if (params.get('error') === 'auth') {
-      setError('El enlace de confirmación ha expirado o no es válido. Intenta iniciar sesión con tu contraseña.')
-    }
-  }, [params])
-
-  const handleLogin = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setLoading(true)
     setError('')
-    const supabase = createClient()
-
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
-    if (authError) { setError(authError.message); setLoading(false); return }
-
-    // Redirigir según rol
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', data.user.id)
-      .single()
-
-    let redirect = params.get('redirect') || (profile?.role === 'admin' ? '/admin' : '/mi-plan')
-    if (redirect.startsWith('/admin') && profile?.role !== 'admin') redirect = '/mi-plan'
-    router.push(redirect)
+    const form = e.currentTarget
+    const fd = new FormData(form)
+    const email = (fd.get('email') as string)?.trim()
+    const password = fd.get('password') as string
+    if (!email || !password) {
+      setError('Email y contraseña son obligatorios')
+      setLoading(false)
+      return
+    }
+    try {
+      const supabase = createClient()
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+      if (authError) {
+        setError(authError.message)
+        setLoading(false)
+        return
+      }
+      let target = redirect
+      if (data.user) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
+        if (profile?.role === 'admin' && redirect.startsWith('/admin')) target = '/admin'
+        else if (!redirect.startsWith('/admin')) target = redirect
+        else target = '/mi-plan'
+      }
+      await supabase.auth.getSession()
+      await new Promise(r => setTimeout(r, 500))
+      window.location.href = target
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error de conexión')
+      setLoading(false)
+    }
   }
 
   return (
@@ -53,29 +66,45 @@ function LoginContent() {
           <p className="text-slate-500 text-sm mt-1">Accede a tu plan de entrenamiento</p>
         </div>
 
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input type="hidden" name="redirect" value={redirect} />
           <div>
             <label className="block text-sm text-slate-400 mb-2">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+            <input type="email" name="email" required
               className="input-field" placeholder="tu@email.com" />
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-2">Contraseña</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-              className="input-field" placeholder="Tu contraseña" />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                required
+                className="input-field pr-12"
+                placeholder="Tu contraseña"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
-          {error && (
+          {hasError && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm">
-              ⚠️ {error}
+              ⚠️ {errorMsg || error || 'Error al iniciar sesión'}
             </div>
           )}
 
-          <button onClick={handleLogin} disabled={loading}
+          <button type="submit" disabled={loading}
             className="w-full py-3.5 bg-brand-500 hover:bg-brand-400 disabled:opacity-50 text-black font-black rounded-xl transition-all">
             {loading ? 'Entrando...' : 'Entrar →'}
           </button>
-        </div>
+        </form>
 
         <p className="text-center text-sm text-slate-500 mt-5">
           ¿No tienes cuenta?{' '}

@@ -9,6 +9,9 @@ const withPWA = require('next-pwa')({
 
 const nextConfig = {
   reactStrictMode: true,
+  async rewrites() {
+    return [{ source: '/favicon.ico', destination: '/icons/icon-192x192.png' }]
+  },
 }
 
 module.exports = withPWA(nextConfig)

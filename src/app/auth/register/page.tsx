@@ -2,8 +2,8 @@
 
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 function RegisterContent() {
   const router = useRouter()
@@ -27,12 +27,11 @@ function RegisterContent() {
     const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
+      options: { emailRedirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback` }
     })
 
     if (authError) { setError(authError.message); setLoading(false); return }
 
-    // Vincular el lead con el user_id recién creado
     if (data.user) {
       await fetch('/api/link-user', {
         method: 'POST',
@@ -41,13 +40,19 @@ function RegisterContent() {
       })
     }
 
+    if (!data.session) {
+      setLoading(false)
+      setError('')
+      router.push(`/auth/verifica-email?email=${encodeURIComponent(email)}`)
+      return
+    }
+
     router.push('/mi-plan?registered=1')
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-sm w-full animate-fadeInUp">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-2">
             <span className="text-xl">💪</span>
@@ -59,7 +64,6 @@ function RegisterContent() {
           <p className="text-slate-500 text-sm mt-1">Crea tu cuenta para ver tu entrenamiento</p>
         </div>
 
-        {/* Tu plan te espera */}
         <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl p-4 mb-6 flex items-center gap-3">
           <span className="text-2xl">🎉</span>
           <div>

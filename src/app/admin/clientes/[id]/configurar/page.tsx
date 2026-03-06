@@ -153,12 +153,15 @@ export default function ConfigurarPage() {
       const res = await fetch('/api/generate-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile: client, config }),
+        body: JSON.stringify({ profile: client, config, clientId: id }),
       })
-      if (!res.ok) throw new Error('Error generando plan')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `Error ${res.status}`)
+      }
       router.push(`/admin/clientes/${id}?tab=plan`)
-    } catch (e) {
-      alert('Error al generar el plan')
+    } catch (e: any) {
+      alert(e?.message || 'Error al generar el plan')
     }
     setGenerating(false)
   }

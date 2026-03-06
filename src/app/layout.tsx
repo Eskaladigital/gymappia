@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { UnregisterSW } from '@/components/UnregisterSW'
 
 export const metadata: Metadata = {
   title: 'TrainCal - Entrenamiento Personal a Distancia',
@@ -27,9 +28,18 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        <link rel="icon" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        {process.env.NODE_ENV === 'development' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `if(typeof navigator!=='undefined'&&navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(reg=>reg.unregister()));}`,
+            }}
+          />
+        )}
       </head>
       <body className="relative">
+        <UnregisterSW />
         {/* Emojis coloridos flotando en el fondo (estilo gamificación) */}
         <div className="bg-silhouette" aria-hidden>
           <span className="text-4xl md:text-5xl opacity-30" style={{ left: '8%', top: '10%', animation: 'floatRight 25s ease-in-out infinite' }}>🏃</span>

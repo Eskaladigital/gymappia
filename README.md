@@ -94,11 +94,9 @@ CRON_SECRET=opcional  # Para proteger /api/push-reminder (cron diario)
 
 ### 2. Base de datos Supabase
 
-Abre el **SQL Editor** de tu proyecto Supabase y ejecuta en orden:
+Abre el **SQL Editor** de tu proyecto Supabase y ejecuta:
 
-1. `supabase-schema.sql` — tablas principales
-2. `supabase-schema-v3.sql` — coach_messages, progress_photos
-3. `supabase-schema-push.sql` — push_subscriptions (para recordatorios)
+1. `supabase/schema.sql` — esquema completo (tablas, índices, RLS)
 
 **Storage:** En Supabase Dashboard → Storage, crea un bucket público `progress-photos` para las fotos de progreso.
 
@@ -111,12 +109,21 @@ Tablas que se crean:
 - `session_logs` — registro de sesiones completadas
 - `user_stats` — gamificación: puntos, racha, logros
 - `profiles` — roles de usuario (admin / client)
+- `coach_messages` — chat coach ↔ cliente
+- `progress_photos` — fotos de progreso semanal
+- `push_subscriptions` — notificaciones push
 
-### 3. URLs de redirección (Supabase Auth)
+### 3. URLs de redirección (Supabase Auth) — **IMPORTANTE**
 
-En **Authentication → URL Configuration** añade:
-- **Site URL**: `http://localhost:3000` (dev) / `https://tu-dominio.com` (prod)
-- **Redirect URLs**: `http://localhost:3000/auth/callback` y `https://tu-dominio.com/auth/callback`
+En **Supabase Dashboard → Authentication → URL Configuration** añade exactamente:
+
+- **Site URL**: `http://localhost:3000` (dev) o `https://tu-dominio.com` (prod)
+- **Redirect URLs** (añade cada una):
+  - `http://localhost:3000/auth/callback`
+  - `http://localhost:3000/**` (para dev con wildcard)
+  - `https://tu-dominio.com/auth/callback` (prod)
+
+Si falta `/auth/callback` en Redirect URLs, la verificación de email fallará al hacer clic en el enlace.
 
 ### 4. Crear el usuario admin
 
@@ -126,6 +133,71 @@ En Supabase Auth, crea el usuario manualmente y luego ejecuta:
 INSERT INTO profiles (id, email, role)
 VALUES ('uuid-del-usuario-admin', 'admin@pacgym.com', 'admin');
 ```
+
+O ejecuta el script de verificación:
+
+```bash
+node --env-file=.env.local scripts/verify-supabase.mjs
+```
+
+---
+
+## 🔐 Autenticación y Login — **CÓMO FUNCIONA**
+
+### Flujo de login
+
+1. **Usuario** entra en `/auth/login` (o es redirigido desde `/admin` o `/mi-plan` si no está logueado)
+2. **Formulario** envía email + contraseña
+3. **Cliente Supabase** (`createClient` en `lib/supabase/client.ts`) llama a `signInWithPassword`
+4. **Supabase Auth** valida credenciales y devuelve sesión
+5. **Cookies** se guardan en el navegador (el cliente usa `document.cookie` vía `@supabase/ssr`)
+6. **Redirección**: admin → `/admin`, cliente → `/mi-plan` (o `?redirect=...`)
+7. **Middleware** lee las cookies en cada petición y verifica sesión con `getUser()`
+
+### Configuración crítica: interfaz de cookies
+
+**⚠️ IMPORTANTE:** El paquete `@supabase/ssr` v0.3.0 usa la interfaz **get/set/remove**, NO getAll/setAll.
+
+En `middleware.ts`, `lib/supabase/server.ts` y `api/auth/login/route.ts` debe usarse:
+
+```typescript
+cookies: {
+  get(name: string) {
+    return request.cookies.get(name)?.value  // o cookieStore.get(name)?.value
+  },
+  set(name: string, value: string, options?: object) {
+    response.cookies.set(name, value, options)
+  },
+  remove(name: string, options?: object) {
+    response.cookies.set(name, '', { ...options, maxAge: 0 })
+  },
+}
+```
+
+Si usas `getAll`/`setAll` (interfaz nueva), las cookies no se leerán ni escribirán correctamente y el login fallará sin error visible.
+
+### Roles
+
+| Rol | Tabla `profiles` | Acceso |
+|-----|------------------|--------|
+| **admin** | `role = 'admin'` | `/admin`, `/mi-plan` |
+| **client** | `role = 'client'` | Solo `/mi-plan` |
+
+### Probar el login
+
+```bash
+npm run test:login        # Verifica Auth + perfil admin (sin servidor)
+npm run test:login:e2e    # Prueba E2E en navegador (requiere npm run dev en otra terminal)
+```
+
+El script usa las credenciales de `.env.local` y prueba con `contacto@eskaladigital.com`.
+
+### Si el login no redirige o falla
+
+1. **Comprueba la interfaz de cookies**: `get`/`set`/`remove`, no `getAll`/`setAll`
+2. **Versión de @supabase/ssr**: Este proyecto usa `0.3.0`. Versiones más nuevas pueden tener API distinta
+3. **Redirect URLs en Supabase**: Debe incluir `http://localhost:3000/**` y `http://localhost:3000/auth/callback`
+4. **Perfil admin**: El usuario debe existir en `profiles` con `role = 'admin'`. Ejecuta `scripts/verify-supabase.mjs`
 
 ---
 
@@ -137,7 +209,8 @@ VALUES ('uuid-del-usuario-admin', 'admin@pacgym.com', 'admin');
 | `/start` | Público | Formulario 6 pasos + fake AI loading |
 | `/auth/register` | Público | Registro post-formulario (email pre-rellenado) |
 | `/auth/login` | Público | Inicio de sesión |
-| `/auth/callback` | Público | Callback de Supabase tras confirmar email |
+| `/auth/verifica-email` | Público | Mensaje "revisa tu correo" tras registro (si Supabase requiere confirmación) |
+| `/auth/callback` | Público | Callback de Supabase tras hacer clic en el enlace de verificación |
 | `/mi-plan` | 🔒 Cliente | Calendario semanal + gamificación + logros |
 | `/mi-plan/chat` | 🔒 Cliente | Chat con coach IA |
 | `/admin` | 🔒 Admin | Lista de todos los clientes (pending/activos) |
@@ -247,6 +320,7 @@ El cliente acumula en `/mi-plan`:
 
 | Endpoint | Método | Descripción |
 |----------|--------|-------------|
+| `/api/auth/login` | POST | Login (JSON o form). Devuelve cookies de sesión + redirect |
 | `/api/leads` | POST | Guarda formulario público sin auth (service role) |
 | `/api/link-user` | POST | Vincula lead con usuario registrado |
 | `/api/suggest-config` | POST | IA analiza perfil y devuelve configuración sugerida |
@@ -270,7 +344,9 @@ src/
 │   ├── start/page.tsx                     → Formulario público + fake AI
 │   ├── auth/
 │   │   ├── login/page.tsx
-│   │   └── register/page.tsx
+│   │   ├── register/page.tsx
+│   │   ├── callback/page.tsx    # Callback verificación email
+│   │   └── verifica-email/page.tsx
 │   ├── mi-plan/page.tsx                   → Home cliente (calendario + gamificación)
 │   ├── admin/
 │   │   ├── page.tsx                       → Dashboard admin
@@ -331,8 +407,10 @@ Todas las tablas tienen RLS activado en Supabase:
 ## ▶️ Scripts
 
 ```bash
-npm run dev      # Desarrollo (PWA desactivada)
-npm run build    # Build de producción
-npm start        # Servidor de producción (PWA activa)
-npm run lint     # Linter
+npm run dev           # Desarrollo (PWA desactivada)
+npm run build         # Build de producción
+npm start             # Servidor de producción (PWA activa)
+npm run lint          # Linter
+npm run test:login    # Verifica Supabase Auth + perfil admin
+npm run test:login:e2e # Prueba E2E de login (servidor debe estar corriendo)
 ```

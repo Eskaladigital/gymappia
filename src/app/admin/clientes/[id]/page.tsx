@@ -55,12 +55,15 @@ export default function AdminClientePage() {
       const res = await fetch('/api/generate-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(client),
+        body: JSON.stringify({ profile: client, clientId: id }),
       })
-      if (!res.ok) throw new Error('Error generando plan')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `Error ${res.status}`)
+      }
       await loadData()
-    } catch (e) {
-      alert('Error al generar el plan')
+    } catch (e: any) {
+      alert(e?.message || 'Error al generar el plan')
     }
     setGenerating(false)
   }
