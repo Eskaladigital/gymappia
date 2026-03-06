@@ -57,11 +57,6 @@ export default function HomePage() {
             Acceder a mi cuenta →
           </Link>
         </div>
-
-        <p className="text-xs text-slate-600 mt-6">
-          ¿Eres entrenador?{' '}
-          <Link href="/admin" className="text-brand-500 hover:underline">Panel de administración</Link>
-        </p>
       </div>
     </main>
   )
