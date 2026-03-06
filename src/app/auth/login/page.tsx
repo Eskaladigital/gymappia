@@ -108,7 +108,7 @@ function LoginContent() {
 
         <p className="text-center text-sm text-slate-500 mt-5">
           ¿No tienes cuenta?{' '}
-          <Link href="/start" className="text-brand-400 hover:underline">Crea tu plan gratis</Link>
+          <Link href="/start" className="text-brand-400 hover:underline">Crea tu plan</Link>
         </p>
       </div>
     </div>

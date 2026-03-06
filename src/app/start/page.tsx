@@ -182,7 +182,7 @@ export default function StartPage() {
             onClick={() => router.push(`/auth/register?email=${encodeURIComponent(profile.email || '')}`)}
             className="w-full py-4 bg-brand-500 hover:bg-brand-400 text-black font-black rounded-xl text-base transition-all mb-3"
           >
-            Acceder a mi plan gratis →
+            Acceder a mi plan →
           </button>
           <p className="text-xs text-slate-500">
             Ya tienes cuenta? <button onClick={() => router.push('/auth/login')} className="text-brand-400 hover:underline">Inicia sesión</button>
@@ -208,7 +208,7 @@ export default function StartPage() {
           </span>
         </div>
         <h1 className="text-xl font-bold">Crea tu plan de entrenamiento</h1>
-        <p className="text-slate-500 text-sm mt-1">Gratis · Personalizado con IA · Sin compromiso</p>
+        <p className="text-slate-500 text-sm mt-1">Personalizado con IA · Sin compromiso</p>
       </div>
 
       {/* Progress steps */}

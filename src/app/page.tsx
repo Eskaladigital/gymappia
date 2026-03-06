@@ -20,15 +20,15 @@ export default function HomePage() {
             <h1 className="text-5xl font-black leading-none tracking-tight" style={{ fontFamily: 'Syne, sans-serif' }}>
               PAC<span className="text-brand-400">GYM</span>
             </h1>
-            <p className="text-slate-500 text-sm tracking-widest uppercase">Entrenamiento personal</p>
+            <p className="text-slate-500 dark:text-slate-500 text-sm tracking-widest uppercase">Entrenamiento personal</p>
           </div>
         </div>
 
-        <p className="text-xl text-slate-300 mb-2 font-light">
+        <p className="text-xl text-slate-600 dark:text-slate-300 mb-2 font-light">
           Tu plan de entrenamiento personalizado
         </p>
-        <p className="text-slate-500 mb-10 text-sm">
-          Generado con IA · Supervisado por tu coach · Gratis para empezar
+        <p className="text-slate-500 dark:text-slate-500 mb-10 text-sm">
+          Generado con IA · Supervisado por tu coach
         </p>
 
         {/* Features */}
@@ -40,7 +40,7 @@ export default function HomePage() {
           ].map(f => (
             <div key={f.label} className="glass rounded-2xl p-4 text-center">
               <div className="text-2xl mb-2">{f.icon}</div>
-              <p className="text-xs font-semibold text-white">{f.label}</p>
+              <p className="text-xs font-semibold text-slate-900 dark:text-white">{f.label}</p>
               <p className="text-xs text-slate-500 mt-0.5">{f.sub}</p>
             </div>
           ))}
@@ -50,10 +50,10 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/start"
             className="px-8 py-4 bg-brand-500 hover:bg-brand-400 text-black font-black rounded-xl transition-all text-sm tracking-wide">
-            🚀 Crear mi plan gratis
+            🚀 Crear mi plan
           </Link>
           <Link href="/auth/login"
-            className="px-8 py-4 glass hover:bg-white/10 text-white font-medium rounded-xl transition-all text-sm border border-white/10">
+            className="px-8 py-4 glass hover:bg-slate-100 dark:hover:bg-white/10 text-slate-900 dark:text-white font-medium rounded-xl transition-all text-sm border border-slate-200 dark:border-white/10">
             Acceder a mi cuenta →
           </Link>
         </div>

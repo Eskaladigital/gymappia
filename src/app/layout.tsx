@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { UnregisterSW } from '@/components/UnregisterSW'
+import ThemeToggleOrFixed from '@/components/ThemeToggleOrFixed'
 
 export const metadata: Metadata = {
   title: 'TrainCal - Entrenamiento Personal a Distancia',
@@ -28,6 +29,11 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var s=localStorage.getItem('pacgym-theme');var d=!s&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',s==='light'?false:s==='dark'?true:d);})();`,
+          }}
+        />
         <link rel="icon" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         {process.env.NODE_ENV === 'development' && (
@@ -52,6 +58,7 @@ export default function RootLayout({
           <span className="text-3xl md:text-4xl opacity-25" style={{ left: '70%', top: '60%', animation: 'floatRight 24s ease-in-out infinite 10s' }}>🏋️</span>
         </div>
         <div className="relative z-10">{children}</div>
+        <ThemeToggleOrFixed />
       </body>
     </html>
   )
