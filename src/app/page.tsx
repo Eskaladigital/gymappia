@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Logo } from '@/components/Logo'
 
 export default function HomePage() {
   return (
@@ -13,9 +12,16 @@ export default function HomePage() {
 
       <div className="relative z-10 text-center max-w-xl animate-fadeInUp">
         {/* Logo PACGYM */}
-        <div className="inline-flex flex-col items-center gap-3 mb-8">
-          <Logo size={80} className="rounded-2xl" />
-          <p className="text-slate-500 text-sm tracking-widest uppercase">Entrenamiento personal</p>
+        <div className="inline-flex items-center gap-3 mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center animate-pulse-green">
+            <span className="text-3xl">💪</span>
+          </div>
+          <div className="text-left">
+            <h1 className="text-5xl font-black leading-none tracking-tight" style={{ fontFamily: 'Syne, sans-serif' }}>
+              PAC<span className="text-brand-400">GYM</span>
+            </h1>
+            <p className="text-slate-500 text-sm tracking-widest uppercase">Entrenamiento personal</p>
+          </div>
         </div>
 
         <p className="text-xl text-slate-300 mb-2 font-light">

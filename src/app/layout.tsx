@@ -3,17 +3,13 @@ import './globals.css'
 import { UnregisterSW } from '@/components/UnregisterSW'
 
 export const metadata: Metadata = {
-  title: 'PACGYM - Entrenamiento Personal a Distancia',
+  title: 'TrainCal - Entrenamiento Personal a Distancia',
   description: 'Genera calendarios de entrenamiento personalizados con IA para tus clientes',
   manifest: '/manifest.json',
-  icons: {
-    icon: '/icons/icon-512x512.png',
-    apple: '/icons/icon-512x512.png',
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'PACGYM',
+    title: 'TrainCal',
   },
 }
 
@@ -32,8 +28,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        <link rel="icon" href="/icons/icon-512x512.png" />
-        <link rel="apple-touch-icon" href="/icons/icon-512x512.png" />
+        <link rel="icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         {process.env.NODE_ENV === 'development' && (
           <script
             dangerouslySetInnerHTML={{

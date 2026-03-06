@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Logo } from '@/components/Logo'
 import type { ClientProfile, ClientGoal, TrainingLocation, FitnessLevel, DayOfWeek } from '@/types'
 
 // ─── Steps config ────────────────────────────────────────────────────────────
@@ -202,8 +201,11 @@ export default function StartPage() {
     <div className="min-h-screen px-4 py-8 max-w-xl mx-auto">
       {/* Header PACGYM */}
       <div className="text-center mb-8">
-        <div className="inline-flex flex-col items-center gap-2 mb-4">
-          <Logo size={56} />
+        <div className="inline-flex items-center gap-2 mb-4">
+          <span className="text-2xl">💪</span>
+          <span className="text-2xl font-black tracking-tight" style={{ fontFamily: 'Syne, sans-serif' }}>
+            PAC<span className="text-brand-400">GYM</span>
+          </span>
         </div>
         <h1 className="text-xl font-bold">Crea tu plan de entrenamiento</h1>
         <p className="text-slate-500 text-sm mt-1">Gratis · Personalizado con IA · Sin compromiso</p>
