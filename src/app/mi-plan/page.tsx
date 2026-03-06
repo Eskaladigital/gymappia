@@ -3,7 +3,6 @@
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { LayoutDashboard } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { TrainingPlan, ClientProfile, UserStats, WorkoutDay, SessionLog } from '@/types'
 
@@ -25,7 +24,6 @@ function MiPlanContent() {
 
   const [client, setClient] = useState<ClientProfile | null>(null)
   const [plan, setPlan] = useState<TrainingPlan | null>(null)
-  const [isAdmin, setIsAdmin] = useState(false)
   const [stats, setStats] = useState<UserStats | null>(null)
   const [logs, setLogs] = useState<SessionLog[]>([])
   const [activeWeek, setActiveWeek] = useState(1)
@@ -84,13 +82,10 @@ function MiPlanContent() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [profileRes, clientRes, statsRes] = await Promise.all([
-      supabase.from('profiles').select('role').eq('id', user.id).single(),
+    const [clientRes, statsRes] = await Promise.all([
       supabase.from('clients').select('*').eq('user_id', user.id).single(),
       supabase.from('user_stats').select('*').eq('user_id', user.id).single(),
     ])
-
-    if (profileRes.data?.role === 'admin') setIsAdmin(true)
 
     if (clientRes.data) {
       setClient(clientRes.data)
@@ -376,29 +371,78 @@ function MiPlanContent() {
         </div>
       )}
 
-      {/* Header PACGYM */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <span className="text-lg font-black" style={{ fontFamily: 'Syne, sans-serif' }}>
-            PAC<span className="text-brand-400">GYM</span>
-          </span>
-          <p className="text-slate-500 text-xs">Hola, {client?.nombre?.split(' ')[0] || 'Usuario'} 👋</p>
-        </div>
-        <div className="flex items-center gap-3">
-          {isAdmin && (
-            <Link href="/admin" className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-500/30 hover:bg-brand-500/30 text-brand-400 transition-colors" title="Panel de control">
-              <LayoutDashboard size={20} />
-            </Link>
-          )}
-          <div className="text-right">
-            <p className="text-brand-400 font-black text-xl">{stats?.puntos_totales || 0}</p>
-            <p className="text-xs text-slate-500">puntos</p>
-          </div>
+      {/* Saludo y puntos */}
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-slate-400">Hola, <span className="text-white font-semibold">{client?.nombre?.split(' ')[0] || 'Usuario'}</span> 👋</p>
+        <div className="text-right">
+          <p className="text-brand-400 font-black text-xl">{stats?.puntos_totales || 0}</p>
+          <p className="text-xs text-slate-500">puntos</p>
         </div>
       </div>
 
+      {/* ─── TU PLAN Y CALENDARIO (principal) ───────────────────────────────── */}
+      {plan && (
+        <>
+          <div className="glass rounded-2xl p-4 mb-4">
+            <p className="text-xs text-brand-400 font-semibold uppercase tracking-wider mb-1">📅 Tu plan de entrenamiento</p>
+            <h2 className="font-bold text-lg">{plan.titulo}</h2>
+            <div className="w-full bg-white/5 rounded-full h-1.5 mt-3">
+              <div className="h-full bg-brand-500 rounded-full transition-all" style={{ width: `${progreso}%` }} />
+            </div>
+            <p className="text-xs text-slate-500 mt-1">{completadas}/{totalSesiones} sesiones · {progreso}% completado</p>
+          </div>
+
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+            {plan.semanas.map(s => (
+              <button key={s.semana} onClick={() => setActiveWeek(s.semana)}
+                className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                  activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+                }`}>
+                Sem {s.semana}
+              </button>
+            ))}
+          </div>
+
+          {currentWeek?.objetivo_semana && (
+            <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-300">
+              🎯 {currentWeek.objetivo_semana}
+            </div>
+          )}
+
+          {/* Calendario de días - toca para ver ejercicios */}
+          <p className="text-xs text-slate-500 mb-2">Toca un día para ver los ejercicios</p>
+          <div className="space-y-3 mb-6">
+            {currentWeek?.dias.map((day, idx) => {
+              const done = isLogCompleted(activeWeek, day.dia)
+              return (
+                <button key={idx} onClick={() => { setSelectedDay(day); setShowModal(true) }}
+                  className={`w-full glass rounded-2xl p-4 text-left hover:bg-white/[0.06] transition-all ${done ? 'border border-brand-500/30' : ''}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
+                        done ? 'bg-brand-500 text-black' : 'bg-white/5 text-slate-400'
+                      }`}>
+                        {done ? '✓' : day.dia.slice(0,2).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className={`font-semibold capitalize ${done ? 'text-brand-400' : 'text-white'}`}>{day.dia}</p>
+                        <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
+                      </div>
+                    </div>
+                    {done
+                      ? <span className="text-xs bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full">✅ Hecho</span>
+                      : <span className="text-slate-600 text-lg">›</span>
+                    }
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </>
+      )}
+
       {/* Stats gamificación */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-3 gap-3 mb-5">
         <StatCard icon="🔥" value={stats?.racha_actual || 0} label="Racha" unit="días" highlight />
         <StatCard icon="✅" value={stats?.sesiones_completadas || 0} label="Sesiones" unit="total" />
         <StatCard icon="📈" value={progreso} label="Progreso" unit="%" />
@@ -406,7 +450,7 @@ function MiPlanContent() {
 
       {/* Link a dashboard progreso */}
       <Link href="/mi-plan/progreso"
-        className="flex items-center gap-3 glass rounded-2xl p-4 mb-5 border border-brand-500/20 hover:bg-brand-500/10 transition-all group">
+        className="flex items-center gap-3 glass rounded-2xl p-4 mb-4 border border-brand-500/20 hover:bg-brand-500/10 transition-all group">
         <div className="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-2xl">
           📈
         </div>
@@ -419,7 +463,7 @@ function MiPlanContent() {
 
       {/* Logros */}
       {stats?.logros && stats.logros.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-4">
           <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider">Logros desbloqueados</p>
           <div className="flex gap-2 flex-wrap">
             {stats.logros.includes('primera_sesion') && <Badge icon="🎯" label="Primera sesión" />}
@@ -430,7 +474,7 @@ function MiPlanContent() {
       )}
 
       {/* Recordatorios push */}
-      <div className="glass rounded-2xl p-4 mb-5 border border-brand-500/20">
+      <div className="glass rounded-2xl p-4 mb-4 border border-brand-500/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔔</span>
@@ -465,7 +509,7 @@ function MiPlanContent() {
 
       {/* Botón Chat Coach IA */}
       <Link href="/mi-plan/chat"
-        className="flex items-center gap-3 glass rounded-2xl p-4 mb-5 border border-brand-500/20 hover:bg-brand-500/10 transition-all group">
+        className="flex items-center gap-3 glass rounded-2xl p-4 mb-6 border border-brand-500/20 hover:bg-brand-500/10 transition-all group">
         <div className="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
           💬
         </div>
@@ -475,69 +519,6 @@ function MiPlanContent() {
         </div>
         <span className="text-slate-500 group-hover:text-brand-400">→</span>
       </Link>
-
-      {/* Plan name */}
-      {plan && (
-        <div className="glass rounded-2xl p-4 mb-5">
-          <p className="text-xs text-brand-400 font-semibold uppercase tracking-wider mb-1">Tu plan activo</p>
-          <h2 className="font-bold">{plan.titulo}</h2>
-          <div className="w-full bg-white/5 rounded-full h-1.5 mt-3">
-            <div className="h-full bg-brand-500 rounded-full transition-all" style={{ width: `${progreso}%` }} />
-          </div>
-          <p className="text-xs text-slate-500 mt-1">{completadas}/{totalSesiones} sesiones completadas</p>
-        </div>
-      )}
-
-      {/* Week selector */}
-      {plan && (
-        <>
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-            {plan.semanas.map(s => (
-              <button key={s.semana} onClick={() => setActiveWeek(s.semana)}
-                className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                  activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
-                }`}>
-                Sem {s.semana}
-              </button>
-            ))}
-          </div>
-
-          {currentWeek?.objetivo_semana && (
-            <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-300">
-              🎯 {currentWeek.objetivo_semana}
-            </div>
-          )}
-
-          {/* Calendario de días */}
-          <div className="space-y-3 mb-6">
-            {currentWeek?.dias.map((day, idx) => {
-              const done = isLogCompleted(activeWeek, day.dia)
-              return (
-                <button key={idx} onClick={() => { setSelectedDay(day); setShowModal(true) }}
-                  className={`w-full glass rounded-2xl p-4 text-left hover:bg-white/[0.06] transition-all ${done ? 'border border-brand-500/30' : ''}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
-                        done ? 'bg-brand-500 text-black' : 'bg-white/5 text-slate-400'
-                      }`}>
-                        {done ? '✓' : day.dia.slice(0,2).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className={`font-semibold capitalize ${done ? 'text-brand-400' : 'text-white'}`}>{day.dia}</p>
-                        <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
-                      </div>
-                    </div>
-                    {done
-                      ? <span className="text-xs bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full">✅ Hecho</span>
-                      : <span className="text-slate-600 text-lg">›</span>
-                    }
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        </>
-      )}
 
       {/* Modal de sesión */}
       {showModal && selectedDay && (

@@ -45,12 +45,7 @@ export default function AdminPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xl font-black" style={{ fontFamily: 'Syne, sans-serif' }}>
-              PAC<span className="text-brand-400">GYM</span>
-            </span>
-            <span className="text-xs bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded-full">Admin</span>
-          </div>
+          <h1 className="text-xl font-black mb-1" style={{ fontFamily: 'Syne, sans-serif' }}>Panel de control</h1>
           <p className="text-slate-500 text-sm">{clients.length} clientes en total</p>
         </div>
         <div className="flex gap-2">

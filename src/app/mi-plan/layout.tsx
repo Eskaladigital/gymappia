@@ -2,7 +2,7 @@
 
 import TopNav from '@/components/TopNav'
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function MiPlanLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
       <TopNav />
