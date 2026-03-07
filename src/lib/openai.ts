@@ -46,6 +46,11 @@ export async function generateTrainingPlan(
   }
   const rotacionSugerida = rotacionEjemplos[session.dias_semana] || 'Distribuir grupos musculares de forma equilibrada'
 
+  // Rango OBLIGATORIO de ejercicios según duración (la IA suele ignorar reglas genéricas)
+  const dur = session.duracion_media_min ?? 45
+  const ejerciciosRange = dur <= 35 ? [3, 4] : dur <= 50 ? [5, 6] : dur <= 70 ? [6, 8] : [7, 10]
+  const [ejMin, ejMax] = ejerciciosRange
+
   const prompt = `
 Eres un programador de entrenamiento físico de élite (NSCA-CSCS).
 Genera un plan de entrenamiento en JSON siguiendo ESTRICTAMENTE las reglas de calidad profesional.
@@ -100,13 +105,14 @@ ${rotacionSugerida}
 - Los días deben tener nombres descriptivos y DISTINTOS: "Fuerza tren superior A", "HIIT metabólico", "Piernas y glúteos", etc.
 - IMPORTANTE: El campo "dia" debe ser exactamente uno de: lunes, martes, miercoles, jueves, viernes, sabado, domingo (sin tildes).
 
-**DURACIÓN Y LLENAR EL TIEMPO — CRÍTICO:**
-La sesión es de ${session.duracion_media_min} min. DEBES llenar ese tiempo con volumen suficiente.
-- 30 min: 3-4 ejercicios, 3 series cada uno. Sesión compacta.
-- 45-50 min: 5-6 ejercicios, 3-4 series. Puedes usar biseries o supersets (ej: pecho + sentadilla alternados) para aprovechar descansos.
-- 60-70 min: 6-7 ejercicios, 3-4 series. Bloque de empuje + bloque de tirón + bloque de piernas, o similar. Usa biseries/triseries cuando sea coherente.
-- 90+ min: 7-8+ ejercicios, 4 series. Sesión completa con calentamiento y trabajo principal.
-Usa biseries (2 ejercicios alternados), triseries (3) o supersets cuando sea lógico (ej: empuje+tirón, piernas alternas) para no desperdiciar tiempo. No hagas solo 4 ejercicios si la sesión es de 70 min: el usuario pagaría por tiempo vacío.
+**DURACIÓN Y NÚMERO DE EJERCICIOS — OBLIGATORIO (NO IGNORAR):**
+La sesión es de ${session.duracion_media_min} min. Cada sesión DEBE tener entre ${ejMin} y ${ejMax} ejercicios.
+- Sesión 30-35 min → 3-4 ejercicios
+- Sesión 45-50 min → 5-6 ejercicios (NUNCA solo 4)
+- Sesión 60-70 min → 6-8 ejercicios (NUNCA solo 4 ni 5)
+- Sesión 90+ min → 7-10 ejercicios
+Si pones 4 ejercicios en una sesión de 70 min, el plan es INCORRECTO. Más tiempo = más ejercicios y/o más series.
+Usa biseries, triseries o supersets cuando sea lógico para aprovechar el tiempo.
 
 **ESTRUCTURA Y DESCANSO:**
 Para cada sesión, incluye en "notas" si usas biseries/triseries (ej: "Biserie: flexiones ↔ remo. Alterna uno tras otro.").
@@ -118,6 +124,7 @@ ESTIMA el descanso entre series (descanso_seg) por ejercicio según el tipo de t
 
 ━━━ FORMATO JSON REQUERIDO ━━━
 CRÍTICO: Genera EXACTAMENTE ${session.semanas_duracion} semanas (ni más ni menos) en el array "semanas".
+CRÍTICO: Cada día/sesión debe tener entre ${ejMin} y ${ejMax} ejercicios en el array "ejercicios" (sesión de ${session.duracion_media_min} min).
 Cada ejercicio debe tener "descanso_seg" estimado según su tipo (fuerza/hipertrofia/resistencia).
 Responde SOLO con JSON válido, sin texto adicional:
 {
@@ -178,6 +185,19 @@ Responde SOLO con JSON válido, sin texto adicional:
   const semanasFinales = (planData.semanas || []).slice(0, semanasPedidas)
   planData.semanas = semanasFinales
   planData.duracion_semanas = semanasPedidas
+
+  // Validar número mínimo de ejercicios por sesión según duración
+  for (const s of planData.semanas || []) {
+    for (const d of s.dias || []) {
+      const count = d.ejercicios?.length ?? 0
+      if (count < ejMin) {
+        throw new Error(
+          `La sesión "${d.tipo}" tiene solo ${count} ejercicios. Para ${dur} min se requieren al menos ${ejMin}. ` +
+          'Genera de nuevo el plan.'
+        )
+      }
+    }
+  }
 
   // Normalizar días (quitar tildes: miércoles → miercoles) para consistencia
   const DIAS_CANONICOS: Record<string, string> = {
