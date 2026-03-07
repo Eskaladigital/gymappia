@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { TrainingPlan, ClientProfile, UserStats, WorkoutDay, SessionLog } from '@/types'
+import MonthlyCalendar from '@/components/MonthlyCalendar'
 
 const DIAS_ORDER = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 
@@ -43,6 +44,8 @@ function MiPlanContent() {
   const [liveExIdx, setLiveExIdx] = useState(0)
   const [liveSet, setLiveSet] = useState(1)
   const [restSeconds, setRestSeconds] = useState(0)
+  // Vista del calendario: semanal o mensual
+  const [calView, setCalView] = useState<'semanal' | 'mensual'>('semanal')
 
   useEffect(() => {
     loadData()
@@ -99,7 +102,6 @@ function MiPlanContent() {
 
       if (planRes.data) {
         setPlan(planRes.data)
-        // Cargar logs
         const logsRes = await supabase
           .from('session_logs')
           .select('*')
@@ -128,7 +130,6 @@ function MiPlanContent() {
     const today = new Date().toISOString().split('T')[0]
     const puntos = 50 + (sensacion * 10)
 
-    // Insertar log
     await supabase.from('session_logs').insert({
       client_id: client.id,
       plan_id: plan.id,
@@ -140,13 +141,11 @@ function MiPlanContent() {
       puntos_ganados: puntos,
     })
 
-    // Actualizar stats
     const newSesiones = (stats?.sesiones_completadas || 0) + 1
     const newRacha = (stats?.racha_actual || 0) + 1
     const newPuntos = (stats?.puntos_totales || 0) + puntos
     const newMax = Math.max(stats?.racha_maxima || 0, newRacha)
 
-    // Comprobar logros nuevos
     const oldLogros = stats?.logros || []
     const newLogros = [...oldLogros]
     if (newSesiones === 1 && !newLogros.includes('primera_sesion')) newLogros.push('primera_sesion')
@@ -232,10 +231,7 @@ function MiPlanContent() {
     if (!liveMode || livePhase !== 'rest' || restSeconds <= 0) return
     const t = setInterval(() => {
       setRestSeconds(s => {
-        if (s <= 1) {
-          advanceLivePhase()
-          return 0
-        }
+        if (s <= 1) { advanceLivePhase(); return 0 }
         return s - 1
       })
     }, 1000)
@@ -285,7 +281,6 @@ function MiPlanContent() {
     </div>
   )
 
-  // ── Sin plan todavía (pending) ──────────────────────────────────────────
   if (pendingPlan) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6">
@@ -311,12 +306,8 @@ function MiPlanContent() {
         )}
         <div className="max-w-sm w-full text-center glass rounded-2xl p-8 animate-fadeInUp">
           <div className="text-5xl mb-4">⏳</div>
-          <h2 className="text-xl font-black mb-2" style={{ fontFamily: 'Syne, sans-serif' }}>
-            Tu plan está en revisión
-          </h2>
-          <p className="text-slate-400 text-sm mb-4">
-            Tu entrenador está personalizando los últimos detalles. Recibirás una notificación en menos de 24h.
-          </p>
+          <h2 className="text-xl font-black mb-2" style={{ fontFamily: 'Syne, sans-serif' }}>Tu plan está en revisión</h2>
+          <p className="text-slate-400 text-sm mb-4">Tu entrenador está personalizando los últimos detalles. Recibirás una notificación en menos de 24h.</p>
           <div className="space-y-2 text-left mt-6">
             {['✅ Formulario recibido', '⏳ Revisión del entrenador', '🔒 Plan pendiente de activación'].map((step, i) => (
               <div key={i} className={`flex items-center gap-2 text-sm ${i < 1 ? 'text-brand-400' : i === 1 ? 'text-yellow-400' : 'text-slate-500'}`}>
@@ -341,7 +332,6 @@ function MiPlanContent() {
   return (
     <div className="min-h-screen px-4 py-6 max-w-lg mx-auto">
 
-      {/* Overlay bienvenida animado */}
       {showWelcomeOverlay && (
         <div className="fixed inset-0 z-[70] bg-slate-950 flex flex-col items-center justify-center px-6 animate-fadeInUp">
           <div className="text-6xl mb-4 animate-bounce">🎉</div>
@@ -363,7 +353,6 @@ function MiPlanContent() {
         </div>
       )}
 
-      {/* Welcome back (banner reducido si ya vieron overlay) */}
       {justRegistered && !showWelcomeOverlay && (
         <div className="bg-brand-500/20 border border-brand-500/30 rounded-2xl p-4 mb-6 animate-fadeInUp">
           <p className="text-brand-400 font-bold">🎉 ¡Bienvenido/a, {client?.nombre?.split(' ')[0]}!</p>
@@ -380,9 +369,10 @@ function MiPlanContent() {
         </div>
       </div>
 
-      {/* ─── TU PLAN Y CALENDARIO (principal) ───────────────────────────────── */}
+      {/* ─── PLAN ─── */}
       {plan && (
         <>
+          {/* Cabecera plan + progreso */}
           <div className="glass rounded-2xl p-4 mb-4">
             <p className="text-xs text-brand-400 font-semibold uppercase tracking-wider mb-1">📅 Tu plan de entrenamiento</p>
             <h2 className="font-bold text-lg">{plan.titulo}</h2>
@@ -392,52 +382,92 @@ function MiPlanContent() {
             <p className="text-xs text-slate-500 mt-1">{completadas}/{totalSesiones} sesiones · {progreso}% completado</p>
           </div>
 
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-            {plan.semanas.map(s => (
-              <button key={s.semana} onClick={() => setActiveWeek(s.semana)}
-                className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                  activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
-                }`}>
-                Sem {s.semana}
-              </button>
-            ))}
+          {/* Toggle vista semanal / mensual */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setCalView('semanal')}
+              className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${
+                calView === 'semanal' ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+              }`}
+            >
+              📅 Semanal
+            </button>
+            <button
+              onClick={() => setCalView('mensual')}
+              className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${
+                calView === 'mensual' ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+              }`}
+            >
+              🗓️ Mensual
+            </button>
           </div>
 
-          {currentWeek?.objetivo_semana && (
-            <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-300">
-              🎯 {currentWeek.objetivo_semana}
-            </div>
+          {/* ── Vista semanal ── */}
+          {calView === 'semanal' && (
+            <>
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+                {plan.semanas.map(s => (
+                  <button key={s.semana} onClick={() => setActiveWeek(s.semana)}
+                    className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+                    }`}>
+                    Sem {s.semana}
+                  </button>
+                ))}
+              </div>
+
+              {currentWeek?.objetivo_semana && (
+                <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-300">
+                  🎯 {currentWeek.objetivo_semana}
+                </div>
+              )}
+
+              <p className="text-xs text-slate-500 mb-2">Toca un día para ver los ejercicios</p>
+              <div className="space-y-3 mb-6">
+                {currentWeek?.dias.map((day, idx) => {
+                  const done = isLogCompleted(activeWeek, day.dia)
+                  return (
+                    <button key={idx} onClick={() => { setSelectedDay(day); setShowModal(true) }}
+                      className={`w-full glass rounded-2xl p-4 text-left hover:bg-white/[0.06] transition-all ${done ? 'border border-brand-500/30' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
+                            done ? 'bg-brand-500 text-black' : 'bg-white/5 text-slate-400'
+                          }`}>
+                            {done ? '✓' : day.dia.slice(0,2).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className={`font-semibold capitalize ${done ? 'text-brand-400' : 'text-white'}`}>{day.dia}</p>
+                            <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
+                          </div>
+                        </div>
+                        {done
+                          ? <span className="text-xs bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full">✅ Hecho</span>
+                          : <span className="text-slate-600 text-lg">›</span>
+                        }
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </>
           )}
 
-          {/* Calendario de días - toca para ver ejercicios */}
-          <p className="text-xs text-slate-500 mb-2">Toca un día para ver los ejercicios</p>
-          <div className="space-y-3 mb-6">
-            {currentWeek?.dias.map((day, idx) => {
-              const done = isLogCompleted(activeWeek, day.dia)
-              return (
-                <button key={idx} onClick={() => { setSelectedDay(day); setShowModal(true) }}
-                  className={`w-full glass rounded-2xl p-4 text-left hover:bg-white/[0.06] transition-all ${done ? 'border border-brand-500/30' : ''}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
-                        done ? 'bg-brand-500 text-black' : 'bg-white/5 text-slate-400'
-                      }`}>
-                        {done ? '✓' : day.dia.slice(0,2).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className={`font-semibold capitalize ${done ? 'text-brand-400' : 'text-white'}`}>{day.dia}</p>
-                        <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
-                      </div>
-                    </div>
-                    {done
-                      ? <span className="text-xs bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full">✅ Hecho</span>
-                      : <span className="text-slate-600 text-lg">›</span>
-                    }
-                  </div>
-                </button>
-              )
-            })}
-          </div>
+          {/* ── Vista mensual ── */}
+          {calView === 'mensual' && (
+            <div className="mb-6">
+              <MonthlyCalendar
+                plan={plan}
+                logs={logs}
+                startDate={plan.created_at?.split('T')[0]}
+                onDayClick={(day, semana) => {
+                  setActiveWeek(semana)
+                  setSelectedDay(day)
+                  setShowModal(true)
+                }}
+              />
+            </div>
+          )}
         </>
       )}
 
@@ -448,12 +478,9 @@ function MiPlanContent() {
         <StatCard icon="📈" value={progreso} label="Progreso" unit="%" />
       </div>
 
-      {/* Link a dashboard progreso */}
       <Link href="/mi-plan/progreso"
         className="flex items-center gap-3 glass rounded-2xl p-4 mb-4 border border-brand-500/20 hover:bg-brand-500/10 transition-all group">
-        <div className="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-2xl">
-          📈
-        </div>
+        <div className="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-2xl">📈</div>
         <div className="flex-1 text-left">
           <p className="font-bold text-brand-400">Ver mi progreso</p>
           <p className="text-xs text-slate-500">Gráficas, racha, sensaciones y logros</p>
@@ -461,7 +488,6 @@ function MiPlanContent() {
         <span className="text-slate-500 group-hover:text-brand-400">→</span>
       </Link>
 
-      {/* Logros */}
       {stats?.logros && stats.logros.length > 0 && (
         <div className="mb-4">
           <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider">Logros desbloqueados</p>
@@ -473,7 +499,6 @@ function MiPlanContent() {
         </div>
       )}
 
-      {/* Recordatorios push */}
       <div className="glass rounded-2xl p-4 mb-4 border border-brand-500/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -507,12 +532,9 @@ function MiPlanContent() {
         </div>
       </div>
 
-      {/* Botón Chat Coach IA */}
       <Link href="/mi-plan/chat"
         className="flex items-center gap-3 glass rounded-2xl p-4 mb-6 border border-brand-500/20 hover:bg-brand-500/10 transition-all group">
-        <div className="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
-          💬
-        </div>
+        <div className="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">💬</div>
         <div className="flex-1 text-left">
           <p className="font-bold text-brand-400">Pregunta a tu coach</p>
           <p className="text-xs text-slate-500">¿Sustituir ejercicio? ¿Dudas? Responde con tu plan</p>
@@ -520,7 +542,7 @@ function MiPlanContent() {
         <span className="text-slate-500 group-hover:text-brand-400">→</span>
       </Link>
 
-      {/* Modal de sesión */}
+      {/* ── Modal de sesión ── */}
       {showModal && selectedDay && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end justify-center z-50 px-4 pb-4">
           <div className="w-full max-w-lg glass rounded-3xl p-5 animate-fadeInUp max-h-[85vh] overflow-y-auto">
@@ -545,7 +567,6 @@ function MiPlanContent() {
               </div>
             )}
 
-            {/* Ejercicios */}
             <div className="space-y-2 mb-5">
               {selectedDay.ejercicios.map((ej, i) => (
                 <div key={i} className="py-2.5 border-b border-white/5 last:border-0">
@@ -588,7 +609,6 @@ function MiPlanContent() {
               ))}
             </div>
 
-            {/* Modo entrenamiento en vivo + Marcar como hecho */}
             {!isLogCompleted(activeWeek, selectedDay.dia) && (
               <>
                 <button onClick={startLiveMode}
@@ -623,7 +643,6 @@ function MiPlanContent() {
         </div>
       )}
 
-      {/* Modal compartir logro */}
       {logroParaCompartir && (
         <div className="fixed inset-0 z-[75] bg-black/90 flex items-center justify-center p-4">
           <div className="w-full max-w-sm glass rounded-3xl p-6 text-center animate-fadeInUp border-2 border-brand-500/40">
@@ -638,21 +657,17 @@ function MiPlanContent() {
                 <span>📱</span> WhatsApp
               </a>
               <button onClick={() => {
-                const text = `¡Acabo de desbloquear "${logroParaCompartir.label}" en PACGYM! 💪`
-                navigator.clipboard?.writeText(text)
+                navigator.clipboard?.writeText(`¡Acabo de desbloquear "${logroParaCompartir.label}" en PACGYM! 💪`)
                 setLogroParaCompartir(null)
-              }}
-                className="flex-1 py-3 glass hover:bg-white/10 font-bold rounded-xl">
+              }} className="flex-1 py-3 glass hover:bg-white/10 font-bold rounded-xl">
                 Copiar
               </button>
             </div>
-            <button onClick={() => setLogroParaCompartir(null)}
-              className="mt-4 text-slate-500 hover:text-white text-sm">Cerrar</button>
+            <button onClick={() => setLogroParaCompartir(null)} className="mt-4 text-slate-500 hover:text-white text-sm">Cerrar</button>
           </div>
         </div>
       )}
 
-      {/* Modo entrenamiento en vivo - fullscreen */}
       {liveMode && selectedDay && (
         <div className="fixed inset-0 z-[70] bg-slate-950 flex flex-col items-center justify-center px-6">
           <button onClick={() => { setLiveMode(false); setShowModal(true) }}
@@ -663,9 +678,7 @@ function MiPlanContent() {
               <p className="text-brand-400 text-sm font-semibold mb-2">
                 Ejercicio {liveExIdx + 1}/{selectedDay.ejercicios.length} · Serie {liveSet}/{typeof selectedDay.ejercicios[liveExIdx]?.series === 'number' ? selectedDay.ejercicios[liveExIdx].series : 3}
               </p>
-              <h2 className="text-3xl md:text-4xl font-black text-center mb-4">
-                {selectedDay.ejercicios[liveExIdx]?.nombre}
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-black text-center mb-4">{selectedDay.ejercicios[liveExIdx]?.nombre}</h2>
               <p className="text-2xl text-brand-400 font-bold mb-8">
                 {selectedDay.ejercicios[liveExIdx]?.series}×{selectedDay.ejercicios[liveExIdx]?.repeticiones}
               </p>
@@ -682,14 +695,12 @@ function MiPlanContent() {
               <p className="text-slate-500 text-sm mb-2">Descanso</p>
               <p className="text-7xl font-black text-brand-400 mb-4">{restSeconds}</p>
               <p className="text-slate-500 text-sm">siguiente serie en...</p>
-              <button onClick={advanceLivePhase}
-                className="mt-6 text-slate-500 hover:text-white text-sm">Saltar descanso →</button>
+              <button onClick={advanceLivePhase} className="mt-6 text-slate-500 hover:text-white text-sm">Saltar descanso →</button>
             </>
           )}
         </div>
       )}
 
-      {/* Modal vídeo YouTube */}
       {videoModal && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4">
           <div className="w-full max-w-lg">
@@ -703,8 +714,7 @@ function MiPlanContent() {
                   src={`https://www.youtube.com/embed/${videoModal.videoId}?autoplay=1`}
                   title={videoModal.nombre}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
+                  allowFullScreen className="w-full h-full"
                 />
               </div>
             ) : (

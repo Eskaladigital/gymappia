@@ -3,137 +3,192 @@
 import { useState, useEffect, useRef } from 'react'
 
 const FRASES = [
-  'illo... entrena un poquillo... 🥱',
+  'illo... entrena un poquillo 🥱',
   '¡vamos, que tú puedes! 💪',
   'un poquito cada día cambia todo',
   'el sofá no te va a poner bueno...',
   '¡dale, crack! hoy es el día',
-  'tu versión del futuro te lo agradecerá',
+  'tu versión futura te lo agradecerá',
   'menos excusas, más sudor 🔥',
   '¿a qué esperas, campeón?',
   'el dolor de hoy es la fuerza de mañana',
   'cada rep cuenta. cada día suma.',
   '¡arriba esos ánimos! 🙌',
-  'nadie dijo que fuera fácil... pero tú sí puedes',
+  'nadie dijo que fuera fácil...',
+  'el único mal entreno es el que no haces',
+  'hoy puede ser el día que todo cambie',
+  'tu cuerpo puede. tu mente decide.',
 ]
 
-// Zonas SEGURAS en PC: columnas laterales fuera del contenido central (max-w-lg = 512px)
-// El contenido está centrado, así que los márgenes libres son las zonas < (50vw - 256px) y > (50vw + 256px)
-// Ponemos las frases en vertical pegadas a los bordes
-const PC_SLOTS = [
-  { side: 'left' as const,  top: '18%' },
-  { side: 'left' as const,  top: '42%' },
-  { side: 'left' as const,  top: '68%' },
-  { side: 'right' as const, top: '28%' },
-  { side: 'right' as const, top: '54%' },
-  { side: 'right' as const, top: '78%' },
+// Zonas disponibles en PC — fuera del contenido central (max-w-sm = 384px centrado)
+// El contenido ocupa ~384-512px centrado, así que tenemos ~(50vw - 280px) a cada lado
+// Definimos zonas: esquinas, laterales arriba/abajo, zona superior, zona inferior
+const PC_ZONES = [
+  // Izquierda
+  { x: '2%',  y: '12%' },
+  { x: '1%',  y: '38%' },
+  { x: '2%',  y: '62%' },
+  { x: '1%',  y: '82%' },
+  // Derecha
+  { x: '68%', y: '18%' },
+  { x: '70%', y: '44%' },
+  { x: '68%', y: '70%' },
+  { x: '69%', y: '88%' },
+  // Superior centro-izq y centro-der (por encima del contenido)
+  { x: '15%', y: '6%'  },
+  { x: '55%', y: '6%'  },
+  // Inferior
+  { x: '12%', y: '90%' },
+  { x: '58%', y: '91%' },
 ]
 
-// Zonas SEGURAS en móvil: esquina superior izquierda y derecha
-// El top nav tiene ~56px, así que empezamos desde 64px
-// Las frases son pequeñas (max 130px) y se pegan a los laterales
-const MOBILE_SLOTS = [
-  { side: 'left' as const,  top: 68 },
-  { side: 'right' as const, top: 68 },
-]
+interface ActivePhrase {
+  id: number
+  text: string
+  zone: typeof PC_ZONES[number]
+  opacity: number   // 0 → 1 → 0
+  phase: 'in' | 'hold' | 'out'
+}
 
-function useCyclingPhrase(intervalMs: number, offsetStart = 0) {
-  const [idx, setIdx] = useState(offsetStart % FRASES.length)
+let globalId = 0
+
+export default function MotivatingPhrase() {
+  // ── PC: hasta 2 frases activas simultáneas ──────────────────────────────
+  const [pcPhrases, setPcPhrases] = useState<ActivePhrase[]>([])
+  const usedZonesRef = useRef<Set<number>>(new Set())
+  const phraseQueueRef = useRef<number>(Math.floor(Math.random() * FRASES.length))
+
+  useEffect(() => {
+    // Cada ~4-7s intenta añadir una frase si hay menos de 2 activas
+    const trySpawn = () => {
+      setPcPhrases(prev => {
+        if (prev.length >= 2) return prev
+
+        // Elegir zona no ocupada
+        const available = PC_ZONES
+          .map((z, i) => i)
+          .filter(i => !usedZonesRef.current.has(i))
+        if (available.length === 0) return prev
+
+        const zoneIdx = available[Math.floor(Math.random() * available.length)]
+        usedZonesRef.current.add(zoneIdx)
+
+        const phraseIdx = phraseQueueRef.current % FRASES.length
+        phraseQueueRef.current++
+
+        const phrase: ActivePhrase = {
+          id: globalId++,
+          text: FRASES[phraseIdx],
+          zone: PC_ZONES[zoneIdx],
+          opacity: 0,
+          phase: 'in',
+        }
+
+        // Fade in después de un frame
+        setTimeout(() => {
+          setPcPhrases(p => p.map(ph => ph.id === phrase.id ? { ...ph, opacity: 1, phase: 'hold' } : ph))
+        }, 50)
+
+        // Hold durante 5-8s luego fade out
+        const holdMs = 5000 + Math.random() * 3000
+        setTimeout(() => {
+          setPcPhrases(p => p.map(ph => ph.id === phrase.id ? { ...ph, opacity: 0, phase: 'out' } : ph))
+          // Quitar del DOM y liberar zona
+          setTimeout(() => {
+            setPcPhrases(p => p.filter(ph => ph.id !== phrase.id))
+            usedZonesRef.current.delete(zoneIdx)
+          }, 900)
+        }, holdMs)
+
+        return [...prev, phrase]
+      })
+    }
+
+    // Spawn inicial con pequeño delay
+    const t1 = setTimeout(trySpawn, 800)
+    const t2 = setTimeout(trySpawn, 2400)
+
+    // Spawn periódico
+    const interval = setInterval(() => {
+      trySpawn()
+    }, 3500 + Math.random() * 2000)
+
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearInterval(interval)
+    }
+  }, [])
+
+  return (
+    <>
+      {/* ── PC: frases flotantes horizontales ── */}
+      {pcPhrases.map(ph => (
+        <p
+          key={ph.id}
+          aria-hidden
+          className="text-neon italic hidden lg:block"
+          style={{
+            position: 'fixed',
+            left: ph.zone.x,
+            top: ph.zone.y,
+            opacity: ph.opacity,
+            transition: 'opacity 0.85s ease',
+            pointerEvents: 'none',
+            zIndex: 5,
+            fontSize: '0.72rem',
+            whiteSpace: 'nowrap',
+            maxWidth: '220px',
+            fontFamily: 'var(--font-body)',
+          }}
+        >
+          {ph.text}
+        </p>
+      ))}
+
+      {/* ── Móvil: 2 frases discretas en esquinas superiores ── */}
+      <MobilePhrase side="left"  offset={0} />
+      <MobilePhrase side="right" offset={1} />
+    </>
+  )
+}
+
+// ── Móvil ────────────────────────────────────────────────────────────────────
+function MobilePhrase({ side, offset }: { side: 'left' | 'right'; offset: number }) {
+  const [idx, setIdx] = useState(offset * 4 % FRASES.length)
   const [visible, setVisible] = useState(true)
 
   useEffect(() => {
-    const cycle = setInterval(() => {
+    const ms = 9000 + offset * 2500
+    const t = setInterval(() => {
       setVisible(false)
       setTimeout(() => {
         setIdx(i => (i + 1) % FRASES.length)
         setVisible(true)
-      }, 700)
-    }, intervalMs)
-    return () => clearInterval(cycle)
-  }, [intervalMs])
+      }, 600)
+    }, ms)
+    return () => clearInterval(t)
+  }, [offset])
 
-  return { text: FRASES[idx], visible }
-}
-
-// ── Frase vertical para PC ───────────────────────────────────────
-function PCPhrase({ side, top, intervalMs, offset }: {
-  side: 'left' | 'right'
-  top: string
-  intervalMs: number
-  offset: number
-}) {
-  const { text, visible } = useCyclingPhrase(intervalMs, offset)
-
-  const style: React.CSSProperties = {
-    position: 'fixed',
-    top,
-    [side]: '6px',
-    transform: `translateY(-50%) rotate(${side === 'left' ? '-90deg' : '90deg'})`,
-    transformOrigin: 'center center',
-    opacity: visible ? 0.82 : 0,
-    transition: 'opacity 0.7s ease',
-    pointerEvents: 'none',
-    zIndex: 5,
-    whiteSpace: 'nowrap',
-    fontSize: '0.75rem',
-    fontFamily: 'var(--font-body)',
-  }
-
-  return <p aria-hidden className="text-neon italic hidden lg:block" style={style}>{text}</p>
-}
-
-// ── Frase horizontal para móvil ─────────────────────────────────
-function MobilePhrase({ side, top, intervalMs, offset }: {
-  side: 'left' | 'right'
-  top: number
-  intervalMs: number
-  offset: number
-}) {
-  const { text, visible } = useCyclingPhrase(intervalMs, offset)
-
-  const style: React.CSSProperties = {
-    position: 'fixed',
-    top: `${top}px`,
-    [side]: '10px',
-    maxWidth: '120px',
-    opacity: visible ? 0.78 : 0,
-    transition: 'opacity 0.7s ease',
-    pointerEvents: 'none',
-    zIndex: 5,
-    fontSize: '0.65rem',
-    lineHeight: '1.35',
-    fontFamily: 'var(--font-body)',
-    textAlign: side === 'right' ? 'right' : 'left',
-  }
-
-  return <p aria-hidden className="text-neon italic block lg:hidden" style={style}>{text}</p>
-}
-
-// ── Componente principal ────────────────────────────────────────
-export default function MotivatingPhrase() {
   return (
-    <>
-      {/* PC: 6 frases en las columnas laterales, cada una con su propio ciclo */}
-      {PC_SLOTS.map((slot, i) => (
-        <PCPhrase
-          key={`pc-${i}`}
-          side={slot.side}
-          top={slot.top}
-          intervalMs={9000 + i * 1500}   // tiempos diferentes para no sincronizarse
-          offset={i * 2}
-        />
-      ))}
-
-      {/* Móvil: 2 frases en las esquinas superiores */}
-      {MOBILE_SLOTS.map((slot, i) => (
-        <MobilePhrase
-          key={`mob-${i}`}
-          side={slot.side}
-          top={slot.top}
-          intervalMs={8000 + i * 2000}
-          offset={i * 3}
-        />
-      ))}
-    </>
+    <p
+      aria-hidden
+      className="text-neon italic block lg:hidden"
+      style={{
+        position: 'fixed',
+        top: '72px',
+        [side]: '8px',
+        maxWidth: '110px',
+        opacity: visible ? 0.6 : 0,
+        transition: 'opacity 0.6s ease',
+        pointerEvents: 'none',
+        zIndex: 5,
+        fontSize: '0.6rem',
+        lineHeight: '1.4',
+        textAlign: side === 'right' ? 'right' : 'left',
+      }}
+    >
+      {FRASES[idx]}
+    </p>
   )
 }

@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { GOAL_LABELS, LEVEL_LABELS, LOCATION_LABELS } from '@/lib/utils'
 import type { ClientProfile, TrainingPlan, WorkoutDay, SessionLog } from '@/types'
+import PlanEditor from '@/components/PlanEditor'
+import MonthlyCalendar from '@/components/MonthlyCalendar'
+import { Suspense } from 'react'
 
-export default function AdminClientePage() {
+function AdminClienteContent() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const supabase = createClient()
@@ -19,6 +22,8 @@ export default function AdminClientePage() {
   const [activeDay, setActiveDay] = useState<WorkoutDay | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'ficha' | 'plan' | 'seguimiento'>('ficha')
+  // Vista del plan: semanal, mensual, editor
+  const [planView, setPlanView] = useState<'semanal' | 'mensual' | 'editor'>('semanal')
   const [coachMessages, setCoachMessages] = useState<{ id: string; mensaje: string; remitente?: string; session_ref_semana?: number; session_ref_dia?: string; created_at: string }[]>([])
   const [progressPhotos, setProgressPhotos] = useState<{ id: string; semana: number; foto_url: string; notas?: string; peso_kg?: number }[]>([])
   const [notaSesion, setNotaSesion] = useState('')
@@ -73,6 +78,18 @@ export default function AdminClientePage() {
     await loadData()
   }
 
+  // Guardar plan editado
+  const savePlan = async (updatedPlan: TrainingPlan) => {
+    if (!plan) return
+    const res = await fetch('/api/update-plan', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan_id: plan.id, semanas: updatedPlan.semanas }),
+    })
+    if (!res.ok) throw new Error('Error guardando')
+    await loadData()
+  }
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <p className="text-slate-500">Cargando ficha...</p>
@@ -109,7 +126,6 @@ export default function AdminClientePage() {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex gap-2 flex-col items-end">
           {client.status === 'pending' && (
             <button onClick={activateClient}
@@ -140,7 +156,7 @@ export default function AdminClientePage() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs principales */}
       <div className="flex gap-2 mb-6">
         {(['ficha', 'plan', 'seguimiento'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
@@ -209,7 +225,8 @@ export default function AdminClientePage() {
             </div>
           ) : (
             <>
-              <div className="glass rounded-2xl p-5 mb-5">
+              {/* Info del plan */}
+              <div className="glass rounded-2xl p-5 mb-4">
                 <h2 className="font-bold mb-1">{plan.titulo}</h2>
                 <p className="text-slate-400 text-sm">{plan.descripcion}</p>
                 {plan.notas_entrenador && (
@@ -219,99 +236,145 @@ export default function AdminClientePage() {
                 )}
               </div>
 
-              {/* Week tabs */}
-              <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-                {plan.semanas.map(s => (
-                  <button key={s.semana} onClick={() => setActiveWeek(s.semana)}
-                    className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                      activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
-                    }`}>
-                    Sem {s.semana}
+              {/* Sub-tabs vista del plan */}
+              <div className="flex gap-2 mb-5">
+                {([
+                  ['semanal', '📅 Semanal'],
+                  ['mensual', '🗓️ Mensual'],
+                  ['editor', '✏️ Editar'],
+                ] as const).map(([key, label]) => (
+                  <button
+                    key={key}
+                    onClick={() => setPlanView(key)}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      planView === key
+                        ? 'bg-white/15 text-white font-bold'
+                        : 'glass text-slate-500 hover:bg-white/10'
+                    }`}
+                  >
+                    {label}
                   </button>
                 ))}
               </div>
 
-              {currentWeek?.objetivo_semana && (
-                <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-300">
-                  🎯 {currentWeek.objetivo_semana}
-                </div>
-              )}
+              {/* ── Vista semanal ── */}
+              {planView === 'semanal' && (
+                <>
+                  <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+                    {plan.semanas.map(s => (
+                      <button key={s.semana} onClick={() => setActiveWeek(s.semana)}
+                        className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                          activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+                        }`}>
+                        Sem {s.semana}
+                      </button>
+                    ))}
+                  </div>
 
-              <div className="space-y-3">
-                {currentWeek?.dias.map((day, idx) => (
-                  <div key={idx} className="glass rounded-2xl overflow-hidden">
-                    <button onClick={() => setActiveDay(activeDay?.dia === day.dia ? null : day)}
-                      className="w-full p-4 text-left hover:bg-white/5 transition-all">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold uppercase">
-                            {day.dia.slice(0,2)}
-                          </span>
-                          <div>
-                            <p className="font-semibold capitalize">{day.dia}</p>
-                            <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
-                          </div>
-                        </div>
-                        <span className="text-slate-600">{activeDay?.dia === day.dia ? '▲' : '▼'}</span>
-                      </div>
-                    </button>
-                    {activeDay?.dia === day.dia && (
-                      <div className="px-4 pb-4 border-t border-white/5">
-                        {day.notas && <p className="text-xs text-amber-400 py-2">💡 {day.notas}</p>}
-                        {/* Nota coach para esta sesión */}
-                        <div className="mb-4 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20">
-                          <p className="text-xs text-brand-400 font-semibold mb-2">💬 Nota para el cliente (esta sesión)</p>
-                          <div className="flex gap-2">
-                            <input type="text" value={notaSesion} onChange={e => setNotaSesion(e.target.value)}
-                              placeholder="Ej: Esta semana aumenta el peso en sentadilla"
-                              className="flex-1 input-field text-sm" />
-                            <button onClick={async () => {
-                              if (!notaSesion.trim()) return
-                              setEnviandoNota(true)
-                              await fetch('/api/coach-message', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  client_id: id,
-                                  remitente: 'coach',
-                                  mensaje: notaSesion.trim(),
-                                  session_ref_semana: activeWeek,
-                                  session_ref_dia: day.dia,
-                                }),
-                              })
-                              setNotaSesion('')
-                              await loadData()
-                              setEnviandoNota(false)
-                            }} disabled={enviandoNota || !notaSesion.trim()}
-                              className="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs disabled:opacity-50">
-                              Enviar
-                            </button>
-                          </div>
-                          {coachMessages.filter(m => m.session_ref_semana === activeWeek && m.session_ref_dia === day.dia).map(m => (
-                            <p key={m.id} className="text-xs text-slate-400 mt-2 pt-2 border-t border-white/5">✓ {m.mensaje}</p>
-                          ))}
-                        </div>
-                        <div className="space-y-2 mt-2">
-                          {day.ejercicios.map((ej, i) => (
-                            <div key={i} className="flex justify-between items-start py-1.5 border-b border-white/5 last:border-0">
+                  {currentWeek?.objetivo_semana && (
+                    <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-300">
+                      🎯 {currentWeek.objetivo_semana}
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    {currentWeek?.dias.map((day, idx) => (
+                      <div key={idx} className="glass rounded-2xl overflow-hidden">
+                        <button onClick={() => setActiveDay(activeDay?.dia === day.dia ? null : day)}
+                          className="w-full p-4 text-left hover:bg-white/5 transition-all">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <span className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold uppercase">
+                                {day.dia.slice(0,2)}
+                              </span>
                               <div>
-                                <p className="text-sm font-medium">{ej.nombre}</p>
-                                {ej.notas && <p className="text-xs text-slate-500">{ej.notas}</p>}
-                              </div>
-                              <div className="ml-4 text-right text-xs text-slate-400">
-                                <p className="text-brand-400 font-semibold">{ej.series}×{ej.repeticiones}</p>
-                                <p>⏸ {ej.descanso_seg}s</p>
+                                <p className="font-semibold capitalize">{day.dia}</p>
+                                <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
                               </div>
                             </div>
-                          ))}
-                        </div>
+                            <span className="text-slate-600">{activeDay?.dia === day.dia ? '▲' : '▼'}</span>
+                          </div>
+                        </button>
+                        {activeDay?.dia === day.dia && (
+                          <div className="px-4 pb-4 border-t border-white/5">
+                            {day.notas && <p className="text-xs text-amber-400 py-2">💡 {day.notas}</p>}
+                            {/* Nota coach */}
+                            <div className="mb-4 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20">
+                              <p className="text-xs text-brand-400 font-semibold mb-2">💬 Nota para el cliente (esta sesión)</p>
+                              <div className="flex gap-2">
+                                <input type="text" value={notaSesion} onChange={e => setNotaSesion(e.target.value)}
+                                  placeholder="Ej: Esta semana aumenta el peso en sentadilla"
+                                  className="flex-1 input-field text-sm" />
+                                <button onClick={async () => {
+                                  if (!notaSesion.trim()) return
+                                  setEnviandoNota(true)
+                                  await fetch('/api/coach-message', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      client_id: id, remitente: 'coach',
+                                      mensaje: notaSesion.trim(),
+                                      session_ref_semana: activeWeek,
+                                      session_ref_dia: day.dia,
+                                    }),
+                                  })
+                                  setNotaSesion('')
+                                  await loadData()
+                                  setEnviandoNota(false)
+                                }} disabled={enviandoNota || !notaSesion.trim()}
+                                  className="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs disabled:opacity-50">
+                                  Enviar
+                                </button>
+                              </div>
+                              {coachMessages.filter(m => m.session_ref_semana === activeWeek && m.session_ref_dia === day.dia).map(m => (
+                                <p key={m.id} className="text-xs text-slate-400 mt-2 pt-2 border-t border-white/5">✓ {m.mensaje}</p>
+                              ))}
+                            </div>
+                            <div className="space-y-2 mt-2">
+                              {day.ejercicios.map((ej, i) => (
+                                <div key={i} className="flex justify-between items-start py-1.5 border-b border-white/5 last:border-0">
+                                  <div>
+                                    <p className="text-sm font-medium">{ej.nombre}</p>
+                                    {ej.notas && <p className="text-xs text-slate-500">{ej.notas}</p>}
+                                  </div>
+                                  <div className="ml-4 text-right text-xs text-slate-400">
+                                    <p className="text-brand-400 font-semibold">{ej.series}×{ej.repeticiones}</p>
+                                    <p>⏸ {ej.descanso_seg}s</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
 
-              {plan.recomendaciones_nutricionales && (
+              {/* ── Vista mensual ── */}
+              {planView === 'mensual' && (
+                <MonthlyCalendar
+                  plan={plan}
+                  logs={logs}
+                  startDate={plan.created_at?.split('T')[0]}
+                  onDayClick={(day, semana) => {
+                    setActiveWeek(semana)
+                    setActiveDay(day)
+                    setPlanView('semanal')
+                  }}
+                />
+              )}
+
+              {/* ── Editor inline ── */}
+              {planView === 'editor' && (
+                <PlanEditor
+                  plan={plan}
+                  onSave={savePlan}
+                />
+              )}
+
+              {plan.recomendaciones_nutricionales && planView === 'semanal' && (
                 <div className="glass rounded-2xl p-5 mt-4">
                   <h3 className="font-bold mb-2">🥗 Nutrición</h3>
                   <p className="text-slate-400 text-sm leading-relaxed">{plan.recomendaciones_nutricionales}</p>
@@ -404,6 +467,18 @@ export default function AdminClientePage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function AdminClientePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-slate-500">Cargando ficha...</p>
+      </div>
+    }>
+      <AdminClienteContent />
+    </Suspense>
   )
 }
 
