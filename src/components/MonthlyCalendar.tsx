@@ -22,6 +22,11 @@ const DIA_TO_JS: Record<string, number> = {
   viernes: 5, sabado: 6, domingo: 0,
 }
 
+// Normaliza "miércoles" → "miercoles" por si la IA devuelve tildes
+function normalizeDia(dia: string): string {
+  return (dia || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
 // Columna del grid (lunes=0 .. domingo=6)
 function dayCol(jsDay: number) {
   return jsDay === 0 ? 6 : jsDay - 1
@@ -85,7 +90,7 @@ function buildCalendar(
       const week = plan.semanas.find(s => s.semana === planWeek)
       if (week) {
         const jsDay = date.getDay()
-        const match = week.dias.find(d => DIA_TO_JS[d.dia] === jsDay)
+        const match = week.dias.find(d => DIA_TO_JS[normalizeDia(d.dia)] === jsDay)
         if (match) {
           workoutDay = match
           semana = planWeek
@@ -93,11 +98,11 @@ function buildCalendar(
       }
     }
 
-    // ¿Está completado? Comparar por semana + nombre de día
+    // ¿Está completado? Comparar por semana + nombre de día (normalizado por tildes)
     const done = workoutDay !== null && logs.some(l =>
       l.completado &&
       l.semana === semana &&
-      l.dia_nombre === workoutDay!.dia
+      normalizeDia(l.dia_nombre) === normalizeDia(workoutDay!.dia)
     )
 
     const isToday = date.getTime() === today.getTime()
