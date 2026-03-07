@@ -38,18 +38,18 @@ export default function PacksPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <button onClick={() => router.push('/admin')}
-            className="text-slate-500 hover:text-white text-sm mb-2 flex items-center gap-1">
+            className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm mb-2 flex items-center gap-1">
             ← Admin
           </button>
-          <h1 className="text-2xl font-black" style={{ fontFamily: 'Syne, sans-serif' }}>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
             📦 Packs de entrenamiento
           </h1>
-          <p className="text-slate-500 text-sm">{allPacks.length} packs disponibles · {SYSTEM_PACKS.length} del sistema · {customPacks.length} personalizados</p>
+          <p className="text-slate-600 dark:text-slate-500 text-sm">{allPacks.length} packs disponibles · {SYSTEM_PACKS.length} del sistema · {customPacks.length} personalizados</p>
         </div>
       </div>
 
       {/* System packs */}
-      <p className="text-xs text-slate-500 uppercase tracking-wider mb-3">Packs del sistema</p>
+      <p className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider mb-3">Packs del sistema</p>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
         {SYSTEM_PACKS.map((pack, i) => (
           <PackCard
@@ -62,13 +62,13 @@ export default function PacksPage() {
       </div>
 
       {/* Custom packs */}
-      <p className="text-xs text-slate-500 uppercase tracking-wider mb-3">Packs personalizados</p>
+      <p className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider mb-3">Packs personalizados</p>
       {loading ? (
-        <p className="text-slate-500 text-sm">Cargando...</p>
+        <p className="text-slate-600 dark:text-slate-500 text-sm">Cargando...</p>
       ) : customPacks.length === 0 ? (
         <div className="glass rounded-2xl p-8 text-center">
-          <p className="text-slate-500 text-sm">Aún no has creado packs personalizados.</p>
-          <p className="text-slate-600 text-xs mt-1">Ve al configurador de cualquier cliente y guarda tu configuración como pack.</p>
+          <p className="text-slate-600 dark:text-slate-500 text-sm">Aún no has creado packs personalizados.</p>
+          <p className="text-slate-600 dark:text-slate-500 text-xs mt-1">Ve al configurador de cualquier cliente y guarda tu configuración como pack.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -94,11 +94,11 @@ export default function PacksPage() {
               <div className="flex items-center gap-3">
                 <span className="text-3xl">{preview.icono}</span>
                 <div>
-                  <h2 className="font-black text-lg">{preview.nombre}</h2>
-                  <p className="text-slate-500 text-sm">{preview.descripcion}</p>
+                  <h2 className="font-black text-lg text-slate-800 dark:text-white">{preview.nombre}</h2>
+                  <p className="text-slate-600 dark:text-slate-500 text-sm">{preview.descripcion}</p>
                 </div>
               </div>
-              <button onClick={() => setPreview(null)} className="text-slate-500 hover:text-white">✕</button>
+              <button onClick={() => setPreview(null)} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white">✕</button>
             </div>
 
             {/* Módulos como barras (siempre los 8 tipos en orden alfabético para comparar entre packs) */}
@@ -108,8 +108,8 @@ export default function PacksPage() {
                   if (!base) return null
                   return (
                     <div key={pm.id} className={`flex items-center gap-3 ${pm.value === 0 ? 'opacity-50' : ''}`}>
-                      <span className="text-sm w-24 text-slate-400">{base.icon} {base.label}</span>
-                      <div className="flex-1 bg-white/5 rounded-full h-2">
+                      <span className="text-sm w-24 text-slate-600 dark:text-slate-400">{base.icon} {base.label}</span>
+                      <div className="flex-1 bg-slate-200 dark:bg-white/5 rounded-full h-2">
                         <div className="h-full rounded-full transition-all"
                           style={{ width: `${pm.value}%`, backgroundColor: base.color }} />
                       </div>
@@ -124,22 +124,22 @@ export default function PacksPage() {
             {/* Session params */}
             <div className="grid grid-cols-3 gap-3 glass rounded-xl p-3">
               <div className="text-center">
-                <p className="text-brand-400 font-black">{preview.session.duracion_media_min}min</p>
-                <p className="text-xs text-slate-500">Duración</p>
+                <p className="text-brand-600 dark:text-brand-400 font-black">{preview.session.duracion_media_min}min</p>
+                <p className="text-xs text-slate-600 dark:text-slate-500">Duración</p>
               </div>
               <div className="text-center">
-                <p className="text-brand-400 font-black">{preview.session.rpe_objetivo}/10</p>
-                <p className="text-xs text-slate-500">RPE</p>
+                <p className="text-brand-600 dark:text-brand-400 font-black">{preview.session.rpe_objetivo}/10</p>
+                <p className="text-xs text-slate-600 dark:text-slate-500">RPE</p>
               </div>
               <div className="text-center">
-                <p className="text-brand-400 font-black capitalize">{preview.session.progresion}</p>
-                <p className="text-xs text-slate-500">Progresión</p>
+                <p className="text-brand-600 dark:text-brand-400 font-black capitalize">{preview.session.progresion}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-500">Progresión</p>
               </div>
             </div>
 
             <div className="flex gap-2 mt-4 flex-wrap">
               {preview.tags.map(t => (
-                <span key={t} className="text-xs px-2 py-1 glass rounded-full text-slate-400">{t}</span>
+                <span key={t} className="text-xs px-2 py-1 glass rounded-full text-slate-600 dark:text-slate-400">{t}</span>
               ))}
             </div>
           </div>
@@ -163,15 +163,15 @@ function PackCard({
     .slice(0, 4)
 
   return (
-    <div className="glass rounded-2xl p-4 flex flex-col gap-2 hover:bg-white/[0.06] transition-all">
+    <div className="glass rounded-2xl p-4 flex flex-col gap-2 hover:bg-slate-100/50 dark:hover:bg-white/[0.06] transition-all">
       <div className="flex items-start justify-between">
         <span className="text-2xl">{pack.icono}</span>
         {isSystem && (
-          <span className="text-xs bg-white/10 text-slate-500 px-2 py-0.5 rounded-full">Sistema</span>
+          <span className="text-xs bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-500 px-2 py-0.5 rounded-full">Sistema</span>
         )}
       </div>
-      <p className="font-bold text-sm leading-tight">{pack.nombre}</p>
-      <p className="text-xs text-slate-500 line-clamp-2 flex-1">{pack.descripcion}</p>
+      <p className="font-bold text-sm leading-tight text-slate-800 dark:text-white">{pack.nombre}</p>
+      <p className="text-xs text-slate-600 dark:text-slate-500 line-clamp-2 flex-1">{pack.descripcion}</p>
 
       {/* Top módulos */}
       <div className="flex gap-1 flex-wrap">
@@ -188,7 +188,7 @@ function PackCard({
 
       <div className="flex gap-2 mt-1">
         <button onClick={onPreview}
-          className="flex-1 py-1.5 glass hover:bg-white/10 rounded-lg text-xs font-medium text-slate-400 transition-all">
+          className="flex-1 py-1.5 glass hover:bg-slate-100/50 dark:hover:bg-white/10 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 transition-all">
           Ver detalles
         </button>
         {onDelete && (

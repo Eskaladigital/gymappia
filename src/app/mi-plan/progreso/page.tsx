@@ -98,8 +98,8 @@ export default function ProgresoPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <button onClick={() => router.push('/mi-plan')} className="text-slate-500 hover:text-white text-sm mb-1 flex items-center gap-1">← Mi plan</button>
-          <h1 className="text-xl font-black" style={{ fontFamily: 'Syne, sans-serif' }}>📈 Mi progreso</h1>
+          <button onClick={() => router.push('/mi-plan')} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm mb-1 flex items-center gap-1">← Mi plan</button>
+          <h1 className="text-xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>📈 Mi progreso</h1>
         </div>
         <div className="text-right">
           <p className="text-brand-400 font-black text-2xl">{progresoPct}%</p>
@@ -113,7 +113,7 @@ export default function ProgresoPage() {
           <p className="text-xs text-brand-400 font-semibold uppercase tracking-wider mb-3">🔥 Tu racha</p>
           <div className="flex items-center gap-2">
             <span className="text-4xl font-black text-brand-400">{stats.racha_actual}</span>
-            <span className="text-slate-500 text-sm">días consecutivos</span>
+            <span className="text-slate-600 dark:text-slate-500 text-sm">días consecutivos</span>
           </div>
           <div className="flex gap-1.5 mt-3">
             {Array.from({ length: Math.min(stats.racha_actual, 14) }).map((_, i) => (
@@ -133,9 +133,9 @@ export default function ProgresoPage() {
         ].map(k => (
           <div key={k.label} className="glass rounded-xl p-3 text-center">
             <div className="text-lg mb-0.5">{k.icon}</div>
-            <div className="text-lg font-black text-brand-400">{k.value}</div>
-            <div className="text-xs text-slate-500 leading-tight">{k.label}</div>
-            <div className="text-xs text-slate-600">{k.sub}</div>
+            <div className="text-lg font-black text-brand-600 dark:text-brand-400">{k.value}</div>
+            <div className="text-xs text-slate-600 dark:text-slate-500 leading-tight">{k.label}</div>
+            <div className="text-xs text-slate-600 dark:text-slate-500">{k.sub}</div>
           </div>
         ))}
       </div>
@@ -157,12 +157,12 @@ export default function ProgresoPage() {
                     <div className="absolute inset-0 bg-white/10 animate-pulse" />
                   )}
                 </div>
-                <span className="text-xs text-slate-500">S{w.semana}</span>
+                <span className="text-xs text-slate-600 dark:text-slate-500">S{w.semana}</span>
               </div>
             )
           })}
         </div>
-        <div className="flex gap-4 mt-3 text-xs text-slate-500">
+        <div className="flex gap-4 mt-3 text-xs text-slate-600 dark:text-slate-500">
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />Completa</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-400 inline-block" />Parcial</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400 inline-block" />Iniciada</span>
@@ -182,7 +182,7 @@ export default function ProgresoPage() {
                 {s > 0 && <span className="text-sm">{SENSACION_EMOJI[Math.round(s)]}</span>}
                 <div className="w-full rounded-t-lg transition-all duration-700"
                   style={{ height: `${height}%`, backgroundColor: color, minHeight: 4, opacity: s === 0 ? 0.2 : 1 }} />
-                <span className="text-xs text-slate-500">S{w.semana}</span>
+                <span className="text-xs text-slate-600 dark:text-slate-500">S{w.semana}</span>
               </div>
             )
           })}
@@ -201,7 +201,7 @@ export default function ProgresoPage() {
                 {w.puntosGanados > 0 && <span className="text-xs text-brand-400 font-bold">{w.puntosGanados}</span>}
                 <div className="w-full rounded-t-lg transition-all duration-700 bg-brand-500/40"
                   style={{ height: `${Math.max(height, 4)}%` }} />
-                <span className="text-xs text-slate-500">S{w.semana}</span>
+                <span className="text-xs text-slate-600 dark:text-slate-500">S{w.semana}</span>
               </div>
             )
           })}
@@ -231,7 +231,7 @@ export default function ProgresoPage() {
             <input type="number" name="semana" min={1} max={12} placeholder="Semana" required
               className="input-field w-24" />
             <input type="file" name="file" accept="image/*" capture="environment" required
-              className="text-sm text-slate-400" />
+              className="text-sm text-slate-600 dark:text-slate-400" />
             <input type="text" name="notas" placeholder="Notas (opcional)"
               className="input-field flex-1 min-w-0" />
             <input type="number" name="peso_kg" step="0.1" placeholder="Peso kg"
@@ -245,9 +245,9 @@ export default function ProgresoPage() {
         {photos.length > 0 && (
           <div className="grid grid-cols-3 gap-2 mt-4">
             {photos.map(p => (
-              <div key={p.id} className="rounded-xl overflow-hidden bg-white/5 aspect-square">
+              <div key={p.id} className="rounded-xl overflow-hidden bg-slate-100 dark:bg-white/5 aspect-square">
                 <img src={p.foto_url} alt={`Semana ${p.semana}`} className="w-full h-full object-cover" />
-                <p className="text-xs text-slate-500 p-1">S{p.semana}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-500 p-1">S{p.semana}</p>
               </div>
             ))}
           </div>
@@ -258,25 +258,25 @@ export default function ProgresoPage() {
       <div className="glass rounded-2xl p-5">
         <p className="text-xs text-brand-400 font-semibold uppercase tracking-wider mb-3">Historial de sesiones</p>
         {logs.length === 0 ? (
-          <p className="text-slate-500 text-sm text-center py-4">Aún no has completado sesiones</p>
+          <p className="text-slate-600 dark:text-slate-500 text-sm text-center py-4">Aún no has completado sesiones</p>
         ) : (
           <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
             {[...logs].reverse().map((log, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+              <div key={i} className="flex items-center justify-between py-2 border-b border-slate-200 dark:border-white/5 last:border-0">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold">
                     S{log.semana}
                   </div>
                   <div>
-                    <p className="text-sm font-medium capitalize">{log.dia_nombre}</p>
-                    <p className="text-xs text-slate-500">{log.fecha}</p>
+                    <p className="text-sm font-medium text-slate-800 dark:text-white capitalize">{log.dia_nombre}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-500">{log.fecha}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   {log.sensacion && <span>{SENSACION_EMOJI[log.sensacion]}</span>}
                   <span className="text-brand-400 font-bold">+{log.puntos_ganados}pts</span>
                   {client && log.sensacion && (
-                    <span className="text-slate-500">~{estKcal(client.peso, getDuracionForLog(log), log.sensacion)} kcal</span>
+                    <span className="text-slate-600 dark:text-slate-500">~{estKcal(client.peso, getDuracionForLog(log), log.sensacion)} kcal</span>
                   )}
                 </div>
               </div>
@@ -300,8 +300,8 @@ export default function ProgresoPage() {
               <div key={a.id} className="glass rounded-xl p-3 flex items-center gap-2 border border-brand-500/20">
                 <span className="text-xl">{a.icon}</span>
                 <div>
-                  <p className="text-xs font-semibold">{a.label}</p>
-                  <p className="text-xs text-brand-400">+{a.pts} pts</p>
+                  <p className="text-xs font-semibold text-slate-800 dark:text-white">{a.label}</p>
+                  <p className="text-xs text-brand-600 dark:text-brand-400">+{a.pts} pts</p>
                 </div>
               </div>
             ))}
@@ -317,7 +317,7 @@ function LoadingScreen() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <div className="text-4xl mb-3 animate-bounce">📈</div>
-        <p className="text-slate-500 text-sm">Cargando progreso...</p>
+        <p className="text-slate-600 dark:text-slate-500 text-sm">Cargando progreso...</p>
       </div>
     </div>
   )

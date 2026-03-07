@@ -95,18 +95,18 @@ export default function StartPage() {
             </div>
           </div>
 
-          <h2 className="text-xl font-black mb-1" style={{ fontFamily: 'Syne, sans-serif' }}>
+          <h2 className="text-xl font-black mb-1 text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
             Creando tu plan personalizado...
           </h2>
-          <p className="text-slate-500 text-xs mb-6">Nuestra IA está analizando tu perfil</p>
+          <p className="text-slate-600 dark:text-slate-500 text-xs mb-6">Nuestra IA está analizando tu perfil</p>
 
           <div className="glass rounded-2xl p-4 mb-4 min-h-[52px] flex items-center justify-center">
-            <p className="text-brand-400 font-medium text-sm animate-fadeInUp" key={aiThought}>
+            <p className="text-brand-600 dark:text-brand-400 font-medium text-sm animate-fadeInUp" key={aiThought}>
               {AI_THOUGHTS[aiThought]}
             </p>
           </div>
 
-          <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+          <div className="w-full bg-slate-200 dark:bg-white/5 rounded-full h-1.5 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-brand-500 to-brand-300 rounded-full transition-all duration-1000"
               style={{ width: `${((aiThought + 1) / AI_THOUGHTS.length) * 100}%` }}
@@ -132,8 +132,8 @@ export default function StartPage() {
           <h2 className="text-2xl font-black mb-1" style={{ fontFamily: 'Syne, sans-serif' }}>
             ¡{profile.nombre?.split(' ')[0]}, tu plan está listo!
           </h2>
-          <p className="text-slate-400 text-sm mb-4">
-            Plan de <strong className="text-white">4 semanas</strong> personalizado para ti.
+          <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+            Plan de <strong className="text-slate-800 dark:text-white">4 semanas</strong> personalizado para ti.
           </p>
 
           <div className="glass rounded-2xl p-4 mb-4 text-left">
@@ -145,14 +145,14 @@ export default function StartPage() {
                 `🏋️ ${LOCATION_LABELS[profile.lugar as string]}`,
                 `⚡ Nivel: ${LEVEL_LABELS[profile.nivel as string]}`,
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-slate-300">
+                <div key={i} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
                   <span className="w-1 h-1 rounded-full bg-brand-500 flex-shrink-0" />
                   {item}
                 </div>
               ))}
             </div>
             <div className="mt-3 pt-3 border-t border-white/5 relative">
-              <div className="blur-sm select-none text-xs text-slate-400 space-y-1">
+              <div className="blur-sm select-none text-xs text-slate-600 dark:text-slate-400 space-y-1">
                 <p>Semana 1 · Día 1: Activación full body...</p>
                 <p>Semana 1 · Día 2: Fuerza tren inferior...</p>
               </div>
@@ -170,11 +170,11 @@ export default function StartPage() {
           >
             Acceder a mi plan →
           </button>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-600 dark:text-slate-500">
             ¿Ya tienes cuenta?{' '}
-            <button onClick={() => router.push('/auth/login')} className="text-brand-400 hover:underline">Inicia sesión</button>
+            <button onClick={() => router.push('/auth/login')} className="text-brand-600 dark:text-brand-400 hover:underline">Inicia sesión</button>
           </p>
-          <p className="text-xs text-slate-600 mt-3">Tu entrenador activará tu plan en menos de 24h</p>
+          <p className="text-xs text-slate-600 dark:text-slate-500 mt-3">Tu entrenador activará tu plan en menos de 24h</p>
         </div>
       </div>
     )
@@ -194,18 +194,18 @@ export default function StartPage() {
               PAC<span className="text-brand-400">GYM</span>
             </span>
           </div>
-          <span className="text-xs text-slate-500">Paso {step}/{STEPS.length}</span>
+          <span className="text-xs text-slate-600 dark:text-slate-500">Paso {step}/{STEPS.length}</span>
         </div>
 
         {/* Progress bar */}
         <div className="flex gap-1 mb-1.5">
           {STEPS.map(s => (
             <div key={s.id} className="flex-1">
-              <div className={`h-1 rounded-full transition-all duration-300 ${s.id <= step ? 'bg-brand-500' : 'bg-white/10'}`} />
+              <div className={`h-1 rounded-full transition-all duration-300 ${s.id <= step ? 'bg-brand-500' : 'bg-slate-200 dark:bg-white/10'}`} />
             </div>
           ))}
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-600 dark:text-slate-500">
           {STEPS[step-1]?.icon} {STEPS[step-1]?.label}
         </p>
       </div>
@@ -216,7 +216,7 @@ export default function StartPage() {
 
           {step === 1 && (
             <div className="space-y-3">
-              <h2 className="text-base font-bold mb-3">👤 Cuéntanos sobre ti</h2>
+              <h2 className="text-base font-bold mb-3 text-slate-800 dark:text-white">👤 Cuéntanos sobre ti</h2>
               <Field label="Tu nombre *">
                 <input type="text" value={profile.nombre || ''} onChange={e => update('nombre', e.target.value)}
                   className="input-field" placeholder="Ej: María García" />
@@ -248,7 +248,7 @@ export default function StartPage() {
                   {(['hombre', 'mujer', 'otro'] as const).map(s => (
                     <button key={s} onClick={() => update('sexo', s)}
                       className={`flex-1 py-2 rounded-xl text-xs capitalize transition-all font-medium ${
-                        profile.sexo === s ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                        profile.sexo === s ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                       }`}>{s}</button>
                   ))}
                 </div>
@@ -258,8 +258,8 @@ export default function StartPage() {
 
           {step === 2 && (
             <div className="space-y-3">
-              <h2 className="text-base font-bold mb-1">❤️ Salud y limitaciones</h2>
-              <p className="text-xs text-slate-500 mb-3">Información confidencial para adaptar tu plan de forma segura.</p>
+              <h2 className="text-base font-bold mb-1 text-slate-800 dark:text-white">❤️ Salud y limitaciones</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-500 mb-3">Información confidencial para adaptar tu plan de forma segura.</p>
               <Field label="¿Tienes lesiones o molestias?">
                 <textarea value={profile.lesiones || ''} onChange={e => update('lesiones', e.target.value)}
                   className="input-field resize-none" rows={2}
@@ -279,7 +279,7 @@ export default function StartPage() {
 
           {step === 3 && (
             <div className="space-y-3">
-              <h2 className="text-base font-bold mb-3">🎯 ¿Cuál es tu objetivo?</h2>
+              <h2 className="text-base font-bold mb-3 text-slate-800 dark:text-white">🎯 ¿Cuál es tu objetivo?</h2>
               <div className="grid grid-cols-2 gap-2">
                 {([
                   ['perder_grasa', '🔥', 'Perder grasa'],
@@ -291,7 +291,7 @@ export default function StartPage() {
                 ] as [ClientGoal, string, string][]).map(([val, icon, label]) => (
                   <button key={val} onClick={() => update('objetivo', val)}
                     className={`p-3 rounded-xl text-xs font-medium text-left transition-all flex items-center gap-2 ${
-                      profile.objetivo === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                      profile.objetivo === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                     }`}>
                     <span className="text-lg">{icon}</span>
                     <span>{label}</span>
@@ -308,7 +308,7 @@ export default function StartPage() {
 
           {step === 4 && (
             <div className="space-y-4">
-              <h2 className="text-base font-bold mb-3">📅 Tu disponibilidad</h2>
+              <h2 className="text-base font-bold mb-3 text-slate-800 dark:text-white">📅 Tu disponibilidad</h2>
               <Field label={`Días por semana: ${profile.sesiones_semana}`}>
                 <input type="range" min={1} max={7} value={profile.sesiones_semana || 3}
                   onChange={e => update('sesiones_semana', +e.target.value)}
@@ -331,7 +331,7 @@ export default function StartPage() {
                     <button key={dia} onClick={() => toggleDia(dia)}
                       className={`w-9 h-9 rounded-lg text-xs font-bold transition-all ${
                         profile.dias_preferidos?.includes(dia)
-                          ? 'bg-brand-500 text-black' : 'glass text-slate-400 hover:bg-white/10'
+                          ? 'bg-brand-500 text-black' : 'glass text-slate-600 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/10'
                       }`}>{DIAS_LABELS[dia]}</button>
                   ))}
                 </div>
@@ -341,7 +341,7 @@ export default function StartPage() {
                   {(['mañana', 'tarde', 'noche'] as const).map(h => (
                     <button key={h} onClick={() => update('horario_preferido', h)}
                       className={`flex-1 py-2 rounded-xl text-xs capitalize transition-all ${
-                        profile.horario_preferido === h ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                        profile.horario_preferido === h ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                       }`}>
                       {h === 'mañana' ? '🌅' : h === 'tarde' ? '🌤️' : '🌙'} {h}
                     </button>
@@ -353,14 +353,14 @@ export default function StartPage() {
 
           {step === 5 && (
             <div className="space-y-3">
-              <h2 className="text-base font-bold mb-3">🏋️ Tu entrenamiento</h2>
+              <h2 className="text-base font-bold mb-3 text-slate-800 dark:text-white">🏋️ Tu entrenamiento</h2>
               <Field label="¿Dónde vas a entrenar?">
                 <div className="grid grid-cols-2 gap-2">
                   {([['casa','🏠','Casa'],['gimnasio','🏋️','Gimnasio'],['exterior','🌿','Exterior'],['mixto','🔄','Mixto']] as [TrainingLocation,string,string][])
                     .map(([val, icon, label]) => (
                       <button key={val} onClick={() => update('lugar', val)}
                         className={`p-2.5 rounded-xl text-xs flex items-center gap-2 transition-all font-medium ${
-                          profile.lugar === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                          profile.lugar === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                         }`}>
                         <span>{icon}</span><span>{label}</span>
                       </button>
@@ -377,7 +377,7 @@ export default function StartPage() {
                     .map(([val, icon]) => (
                       <button key={val} onClick={() => update('nivel', val)}
                         className={`flex-1 py-2 rounded-xl text-xs font-medium capitalize transition-all ${
-                          profile.nivel === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                          profile.nivel === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                         }`}>
                         {icon} {val}
                       </button>
@@ -397,7 +397,7 @@ export default function StartPage() {
 
           {step === 6 && (
             <div className="space-y-3">
-              <h2 className="text-base font-bold mb-3">🧘 Tu estilo de vida</h2>
+              <h2 className="text-base font-bold mb-3 text-slate-800 dark:text-white">🧘 Tu estilo de vida</h2>
               <Field label="¿A qué te dedicas?">
                 <input type="text" value={profile.tipo_trabajo || ''} onChange={e => update('tipo_trabajo', e.target.value)}
                   className="input-field" placeholder="Ej: Oficina, trabajo físico..." />
@@ -430,7 +430,7 @@ export default function StartPage() {
       <div className="flex gap-3 py-3 flex-shrink-0">
         {step > 1 && (
           <button onClick={() => setStep(s => s - 1)}
-            className="flex-1 py-3 glass hover:bg-white/10 rounded-xl text-sm font-medium transition-all">
+            className="flex-1 py-3 glass hover:bg-slate-100/50 dark:hover:bg-white/10 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-all">
             ← Atrás
           </button>
         )}
@@ -454,7 +454,7 @@ export default function StartPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs text-slate-400 mb-1.5">{label}</label>
+      <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1.5">{label}</label>
       {children}
     </div>
   )

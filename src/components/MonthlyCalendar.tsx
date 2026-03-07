@@ -166,19 +166,19 @@ export default function MonthlyCalendar({
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <button onClick={prevMonth}
-          className="w-9 h-9 rounded-xl glass hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all text-xl font-light">
+          className="w-9 h-9 rounded-xl glass hover:bg-slate-200/50 dark:hover:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all text-xl font-light">
           ‹
         </button>
         <div className="text-center">
-          <p className="font-black text-lg" style={{ fontFamily: 'Syne, sans-serif' }}>
+          <p className="font-black text-lg text-slate-800 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
             {MONTH_NAMES[viewMonth]} {viewYear}
           </p>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-500 mt-0.5">
             {monthDone} de {monthWorkouts} sesiones completadas
           </p>
         </div>
         <button onClick={nextMonth}
-          className="w-9 h-9 rounded-xl glass hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all text-xl font-light">
+          className="w-9 h-9 rounded-xl glass hover:bg-slate-200/50 dark:hover:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all text-xl font-light">
           ›
         </button>
       </div>
@@ -302,7 +302,7 @@ export default function MonthlyCalendar({
                     <p className="text-[10px] text-slate-500 uppercase leading-none">
                       {MONTH_NAMES[viewMonth].slice(0,3)}
                     </p>
-                    <p className={`text-sm font-black leading-tight ${c.done ? 'text-brand-400' : 'text-white'}`}>
+                    <p className={`text-sm font-black leading-tight ${c.done ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-white'}`}>
                       {c.date.getDate()}
                     </p>
                   </div>
@@ -312,7 +312,7 @@ export default function MonthlyCalendar({
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className={`text-xs font-semibold capitalize truncate ${c.done ? 'text-brand-300' : 'text-white'}`}>
+                    <p className={`text-xs font-semibold capitalize truncate ${c.done ? 'text-brand-600 dark:text-brand-300' : 'text-slate-800 dark:text-white'}`}>
                       {c.workoutDay!.tipo}
                     </p>
                     <p className="text-[10px] text-slate-500 truncate">

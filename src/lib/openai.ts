@@ -65,7 +65,6 @@ ${activeModules}
 
 ━━━ PARÁMETROS DE SESIÓN ━━━
 - Duración media: ${session.duracion_media_min} min
-- Descanso entre series: ${session.descanso_entre_series_seg}s
 - RPE objetivo: ${session.rpe_objetivo}/10
 - Días/semana: ${session.dias_semana}
 - Semanas totales: ${session.semanas_duracion}
@@ -100,10 +99,26 @@ ${rotacionSugerida}
 - Respetar el equipamiento disponible: ${profile.equipamiento || 'básico'}
 - Los días deben tener nombres descriptivos y DISTINTOS: "Fuerza tren superior A", "HIIT metabólico", "Piernas y glúteos", etc.
 - IMPORTANTE: El campo "dia" debe ser exactamente uno de: lunes, martes, miercoles, jueves, viernes, sabado, domingo (sin tildes).
-- Cada sesión: mínimo 4 ejercicios, máximo 7. Ajustar al tiempo de ${session.duracion_media_min} min
+
+**DURACIÓN Y LLENAR EL TIEMPO — CRÍTICO:**
+La sesión es de ${session.duracion_media_min} min. DEBES llenar ese tiempo con volumen suficiente.
+- 30 min: 3-4 ejercicios, 3 series cada uno. Sesión compacta.
+- 45-50 min: 5-6 ejercicios, 3-4 series. Puedes usar biseries o supersets (ej: pecho + sentadilla alternados) para aprovechar descansos.
+- 60-70 min: 6-7 ejercicios, 3-4 series. Bloque de empuje + bloque de tirón + bloque de piernas, o similar. Usa biseries/triseries cuando sea coherente.
+- 90+ min: 7-8+ ejercicios, 4 series. Sesión completa con calentamiento y trabajo principal.
+Usa biseries (2 ejercicios alternados), triseries (3) o supersets cuando sea lógico (ej: empuje+tirón, piernas alternas) para no desperdiciar tiempo. No hagas solo 4 ejercicios si la sesión es de 70 min: el usuario pagaría por tiempo vacío.
+
+**ESTRUCTURA Y DESCANSO:**
+Para cada sesión, incluye en "notas" si usas biseries/triseries (ej: "Biserie: flexiones ↔ remo. Alterna uno tras otro.").
+ESTIMA el descanso entre series (descanso_seg) por ejercicio según el tipo de trabajo:
+- Fuerza máxima (1-5 reps, sentadilla, peso muerto, press): 90-180s
+- Hipertrofia (6-12 reps): 45-90s
+- Resistencia/condicionamiento (15+ reps, plancha, burpees): 30-45s
+- Biseries/supersets: 30-45s entre ejercicios (el descanso "real" es el tiempo del otro ejercicio)
 
 ━━━ FORMATO JSON REQUERIDO ━━━
 CRÍTICO: Genera EXACTAMENTE ${session.semanas_duracion} semanas (ni más ni menos) en el array "semanas".
+Cada ejercicio debe tener "descanso_seg" estimado según su tipo (fuerza/hipertrofia/resistencia).
 Responde SOLO con JSON válido, sin texto adicional:
 {
   "titulo": "string descriptivo del plan completo",
@@ -126,7 +141,7 @@ Responde SOLO con JSON válido, sin texto adicional:
               "nombre": "nombre del ejercicio",
               "series": 3,
               "repeticiones": "10-12",
-              "descanso_seg": ${session.descanso_entre_series_seg},
+              "descanso_seg": 60,
               "notas": "clave técnica o indicación"
             }
           ]

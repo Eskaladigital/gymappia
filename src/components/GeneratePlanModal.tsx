@@ -47,8 +47,16 @@ export default function GeneratePlanModal({
     if (!open || status !== 'generating') return
     const animate = () => {
       const elapsed = Date.now() - stepStartRef.current
-      const stepElapsed = elapsed % STEP_DURATION_MS
-      const pct = Math.min(100, (stepElapsed / STEP_DURATION_MS) * 100)
+      const stepStartTime = currentStep * STEP_DURATION_MS
+      const stepElapsed = Math.max(0, elapsed - stepStartTime)
+      const isLastStep = currentStep === STEPS.length - 1
+      const rawPct = (stepElapsed / STEP_DURATION_MS) * 100
+      // Último paso: nunca mostrar 100% (la IA puede tardar mucho). Cap en 85% o barra indeterminada
+      const pct = isLastStep
+        ? stepElapsed > STEP_DURATION_MS
+          ? 40 + (Math.sin(stepElapsed / 600) * 0.5 + 0.5) * 35  // oscila 40-75%
+          : Math.min(85, rawPct)
+        : Math.min(100, rawPct)
       setStepProgress(pct)
       rafRef.current = requestAnimationFrame(animate)
     }
@@ -74,7 +82,7 @@ export default function GeneratePlanModal({
           <h3 className="font-black text-xl text-brand-400 mb-2" style={{ fontFamily: 'Syne, sans-serif' }}>
             Plan generado correctamente
           </h3>
-          <p className="text-slate-500 text-sm">Cerrando...</p>
+          <p className="text-slate-600 dark:text-slate-500 text-sm">Cerrando...</p>
         </div>
       </div>
     )
@@ -83,10 +91,10 @@ export default function GeneratePlanModal({
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
       <div className="w-full max-w-md glass rounded-2xl p-6 animate-fadeInUp">
-        <h3 className="font-black text-lg mb-1" style={{ fontFamily: 'Syne, sans-serif' }}>
+        <h3 className="font-black text-lg mb-1 text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
           🤖 Generando plan con IA
         </h3>
-        <p className="text-slate-500 text-sm mb-6">Esto puede tardar unos segundos...</p>
+        <p className="text-slate-600 dark:text-slate-500 text-sm mb-6">Esto puede tardar unos segundos...</p>
 
         <div className="space-y-3">
           {STEPS.map((step, idx) => {
@@ -101,18 +109,20 @@ export default function GeneratePlanModal({
                     ? 'bg-brand-500/20 border border-brand-500/30 text-brand-300'
                     : isActive
                     ? 'bg-brand-500/15 border border-brand-500/40 text-brand-400'
-                    : 'glass text-slate-500'
+                    : 'glass text-slate-600 dark:text-slate-500'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{step.icon}</span>
-                  <span className="text-sm font-medium flex-1">{step.label}</span>
+                  <span className="text-sm font-medium flex-1 text-slate-800 dark:text-white">{step.label}</span>
                   {isCompleted && <span className="text-brand-400">✓</span>}
                   {isActive && (
-                    <span className="text-xs text-brand-400 font-medium">{Math.round(progress)}%</span>
+                    <span className="text-xs text-brand-400 font-medium">
+                      {currentStep === STEPS.length - 1 ? '...' : `${Math.round(progress)}%`}
+                    </span>
                   )}
                 </div>
-                <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-brand-500 transition-all duration-150"
                     style={{ width: `${progress}%` }}

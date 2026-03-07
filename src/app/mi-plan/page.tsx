@@ -277,7 +277,7 @@ function MiPlanContent() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <div className="text-4xl mb-3 animate-bounce">💪</div>
-        <p className="text-slate-500 text-sm">Cargando tu plan...</p>
+        <p className="text-slate-600 dark:text-slate-500 text-sm">Cargando tu plan...</p>
       </div>
     </div>
   )
@@ -292,11 +292,11 @@ function MiPlanContent() {
               ¡Bienvenido/a a PAC<span className="text-brand-400">GYM</span>!
             </h1>
             <p className="text-xl font-bold text-brand-400 mb-1">{client?.nombre?.split(' ')[0] || 'Sport'}</p>
-            <p className="text-slate-400 text-center text-sm mb-6 max-w-xs">
+            <p className="text-slate-500 dark:text-slate-400 text-center text-sm mb-6 max-w-xs">
               Tu plan llegará en breve. Tu entrenador está personalizando los últimos detalles.
             </p>
             <div className="glass rounded-2xl px-6 py-4 mb-8 border border-brand-500/20">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Te avisaremos en</p>
+              <p className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider mb-1">Te avisaremos en</p>
               <p className="text-2xl font-black text-brand-400">menos de 24h</p>
             </div>
             <button onClick={dismissWelcome}
@@ -307,11 +307,11 @@ function MiPlanContent() {
         )}
         <div className="max-w-sm w-full text-center glass rounded-2xl p-8 animate-fadeInUp">
           <div className="text-5xl mb-4">⏳</div>
-          <h2 className="text-xl font-black mb-2" style={{ fontFamily: 'Syne, sans-serif' }}>Tu plan está en revisión</h2>
-          <p className="text-slate-400 text-sm mb-4">Tu entrenador está personalizando los últimos detalles. Recibirás una notificación en menos de 24h.</p>
+          <h2 className="text-xl font-black mb-2 text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>Tu plan está en revisión</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">Tu entrenador está personalizando los últimos detalles. Recibirás una notificación en menos de 24h.</p>
           <div className="space-y-2 text-left mt-6">
             {['✅ Formulario recibido', '⏳ Revisión del entrenador', '🔒 Plan pendiente de activación'].map((step, i) => (
-              <div key={i} className={`flex items-center gap-2 text-sm ${i < 1 ? 'text-brand-400' : i === 1 ? 'text-yellow-400' : 'text-slate-500'}`}>
+              <div key={i} className={`flex items-center gap-2 text-sm ${i < 1 ? 'text-brand-600 dark:text-brand-400' : i === 1 ? 'text-yellow-600 dark:text-yellow-400' : 'text-slate-600 dark:text-slate-500'}`}>
                 {step}
               </div>
             ))}
@@ -356,17 +356,17 @@ function MiPlanContent() {
 
       {justRegistered && !showWelcomeOverlay && (
         <div className="bg-brand-500/20 border border-brand-500/30 rounded-2xl p-4 mb-6 animate-fadeInUp">
-          <p className="text-brand-400 font-bold">🎉 ¡Bienvenido/a, {client?.nombre?.split(' ')[0]}!</p>
-          <p className="text-sm text-slate-400 mt-1">Tu entrenador activará tu plan en breve. ¡A por ello!</p>
+          <p className="text-brand-600 dark:text-brand-400 font-bold">🎉 ¡Bienvenido/a, {client?.nombre?.split(' ')[0]}!</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Tu entrenador activará tu plan en breve. ¡A por ello!</p>
         </div>
       )}
 
       {/* Saludo y puntos */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-slate-400">Hola, <span className="text-white font-semibold">{client?.nombre?.split(' ')[0] || 'Usuario'}</span> 👋</p>
+        <p className="text-slate-600 dark:text-slate-400">Hola, <span className="text-slate-800 dark:text-white font-semibold">{client?.nombre?.split(' ')[0] || 'Usuario'}</span> 👋</p>
         <div className="text-right">
-          <p className="text-brand-400 font-black text-xl">{stats?.puntos_totales || 0}</p>
-          <p className="text-xs text-slate-500">puntos</p>
+          <p className="text-brand-600 dark:text-brand-400 font-black text-xl">{stats?.puntos_totales || 0}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-500">puntos</p>
         </div>
       </div>
 
@@ -375,12 +375,12 @@ function MiPlanContent() {
         <>
           {/* Cabecera plan + progreso */}
           <div className="glass rounded-2xl p-4 mb-4">
-            <p className="text-xs text-brand-400 font-semibold uppercase tracking-wider mb-1">📅 Tu plan de entrenamiento</p>
-            <h2 className="font-bold text-lg">{plan.titulo}</h2>
-            <div className="w-full bg-white/5 rounded-full h-1.5 mt-3">
+            <p className="text-xs text-brand-600 dark:text-brand-400 font-semibold uppercase tracking-wider mb-1">📅 Tu plan de entrenamiento</p>
+            <h2 className="font-bold text-lg text-slate-800 dark:text-white">{plan.titulo}</h2>
+            <div className="w-full bg-slate-200 dark:bg-white/5 rounded-full h-1.5 mt-3">
               <div className="h-full bg-brand-500 rounded-full transition-all" style={{ width: `${progreso}%` }} />
             </div>
-            <p className="text-xs text-slate-500 mt-1">{completadas}/{totalSesiones} sesiones · {progreso}% completado</p>
+            <p className="text-xs text-slate-600 dark:text-slate-500 mt-1">{completadas}/{totalSesiones} sesiones · {progreso}% completado</p>
           </div>
 
           {/* Toggle vista semanal / mensual */}
@@ -388,7 +388,7 @@ function MiPlanContent() {
             <button
               onClick={() => setCalView('semanal')}
               className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${
-                calView === 'semanal' ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+                calView === 'semanal' ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-600 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/10'
               }`}
             >
               📅 Semanal
@@ -396,7 +396,7 @@ function MiPlanContent() {
             <button
               onClick={() => setCalView('mensual')}
               className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${
-                calView === 'mensual' ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+                calView === 'mensual' ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-600 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/10'
               }`}
             >
               🗓️ Mensual
@@ -410,7 +410,7 @@ function MiPlanContent() {
                 {plan.semanas.map(s => (
                   <button key={s.semana} onClick={() => setActiveWeek(s.semana)}
                     className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                      activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+                      activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-600 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/10'
                     }`}>
                     Sem {s.semana}
                   </button>
@@ -418,33 +418,33 @@ function MiPlanContent() {
               </div>
 
               {currentWeek?.objetivo_semana && (
-                <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-300">
+                <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-700 dark:text-brand-300">
                   🎯 {currentWeek.objetivo_semana}
                 </div>
               )}
 
-              <p className="text-xs text-slate-500 mb-2">Toca un día para ver los ejercicios</p>
+              <p className="text-xs text-slate-600 dark:text-slate-500 mb-2">Toca un día para ver los ejercicios</p>
               <div className="space-y-3 mb-6">
                 {currentWeek?.dias.map((day, idx) => {
                   const done = isLogCompleted(activeWeek, day.dia)
                   return (
                     <button key={idx} onClick={() => { setSelectedDay(day); setShowModal(true) }}
-                      className={`w-full glass rounded-2xl p-4 text-left hover:bg-white/[0.06] transition-all ${done ? 'border border-brand-500/30' : ''}`}>
+                      className={`w-full glass rounded-2xl p-4 text-left hover:bg-slate-100/50 dark:hover:bg-white/[0.06] transition-all ${done ? 'border border-brand-500/30' : ''}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className={`min-w-[2.5rem] px-1.5 py-1 rounded-xl flex items-center justify-center font-bold text-sm ${
-                            done ? 'bg-brand-500 text-black' : 'bg-white/5 text-slate-400'
+                            done ? 'bg-brand-500 text-black' : 'bg-slate-200 dark:bg-white/5 text-slate-600 dark:text-slate-400'
                           }`}>
                             {done ? '✓' : (DIA_ABBREV[day.dia] ?? day.dia.slice(0,3))}
                           </div>
                           <div>
-                            <p className={`font-semibold ${done ? 'text-brand-400' : 'text-white'}`}>{DIA_LABEL[day.dia] ?? day.dia}</p>
-                            <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
+                            <p className={`font-semibold ${done ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-white'}`}>{DIA_LABEL[day.dia] ?? day.dia}</p>
+                            <p className="text-xs text-slate-600 dark:text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
                           </div>
                         </div>
                         {done
                           ? <span className="text-xs bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full">✅ Hecho</span>
-                          : <span className="text-slate-600 text-lg">›</span>
+                          : <span className="text-slate-600 dark:text-slate-400 text-lg">›</span>
                         }
                       </div>
                     </button>
@@ -483,15 +483,15 @@ function MiPlanContent() {
         className="flex items-center gap-3 glass rounded-2xl p-4 mb-4 border border-brand-500/20 hover:bg-brand-500/10 transition-all group">
         <div className="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-2xl">📈</div>
         <div className="flex-1 text-left">
-          <p className="font-bold text-brand-400">Ver mi progreso</p>
-          <p className="text-xs text-slate-500">Gráficas, racha, sensaciones y logros</p>
+          <p className="font-bold text-brand-600 dark:text-brand-400">Ver mi progreso</p>
+          <p className="text-xs text-slate-600 dark:text-slate-500">Gráficas, racha, sensaciones y logros</p>
         </div>
-        <span className="text-slate-500 group-hover:text-brand-400">→</span>
+        <span className="text-slate-600 dark:text-slate-500 group-hover:text-brand-500 dark:group-hover:text-brand-400">→</span>
       </Link>
 
       {stats?.logros && stats.logros.length > 0 && (
         <div className="mb-4">
-          <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider">Logros desbloqueados</p>
+          <p className="text-xs text-slate-600 dark:text-slate-500 mb-2 uppercase tracking-wider">Logros desbloqueados</p>
           <div className="flex gap-2 flex-wrap">
             {stats.logros.includes('primera_sesion') && <Badge icon="🎯" label="Primera sesión" />}
             {stats.logros.includes('racha_7') && <Badge icon="🔥" label="Semana perfecta" />}
@@ -505,8 +505,8 @@ function MiPlanContent() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔔</span>
             <div>
-              <p className="font-bold text-sm">Recordatorio de entrenar</p>
-              <p className="text-xs text-slate-500">Te avisamos el día que toca</p>
+              <p className="font-bold text-sm text-slate-800 dark:text-white">Recordatorio de entrenar</p>
+              <p className="text-xs text-slate-600 dark:text-slate-500">Te avisamos el día que toca</p>
             </div>
           </div>
           <button onClick={async () => {
@@ -527,7 +527,7 @@ function MiPlanContent() {
               setPushEnabled(true)
             }
           }} disabled={pushEnabled}
-            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${pushEnabled ? 'bg-brand-500/20 text-brand-400' : 'bg-brand-500 text-black hover:bg-brand-400'}`}>
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${pushEnabled ? 'bg-brand-500/20 text-brand-600 dark:text-brand-400' : 'bg-brand-500 text-black hover:bg-brand-400'}`}>
             {pushEnabled ? '✓ Activado' : 'Activar'}
           </button>
         </div>
@@ -537,10 +537,10 @@ function MiPlanContent() {
         className="flex items-center gap-3 glass rounded-2xl p-4 mb-6 border border-brand-500/20 hover:bg-brand-500/10 transition-all group">
         <div className="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">💬</div>
         <div className="flex-1 text-left">
-          <p className="font-bold text-brand-400">Pregunta a tu coach</p>
-          <p className="text-xs text-slate-500">¿Sustituir ejercicio? ¿Dudas? Responde con tu plan</p>
+          <p className="font-bold text-brand-600 dark:text-brand-400">Pregunta a tu coach</p>
+          <p className="text-xs text-slate-600 dark:text-slate-500">¿Sustituir ejercicio? ¿Dudas? Responde con tu plan</p>
         </div>
-        <span className="text-slate-500 group-hover:text-brand-400">→</span>
+        <span className="text-slate-600 dark:text-slate-500 group-hover:text-brand-500 dark:group-hover:text-brand-400">→</span>
       </Link>
 
       {/* ── Modal de sesión ── */}
@@ -549,10 +549,10 @@ function MiPlanContent() {
           <div className="w-full max-w-lg glass rounded-3xl p-5 animate-fadeInUp max-h-[85vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="font-black text-lg">{DIA_LABEL[selectedDay.dia] ?? selectedDay.dia}</h3>
-                <p className="text-slate-400 text-sm">{selectedDay.tipo} · {selectedDay.duracion_min} min</p>
+                <h3 className="font-black text-lg text-slate-800 dark:text-white">{DIA_LABEL[selectedDay.dia] ?? selectedDay.dia}</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm">{selectedDay.tipo} · {selectedDay.duracion_min} min</p>
               </div>
-              <button onClick={() => { setShowModal(false); setSustituto(null) }} className="text-slate-500 hover:text-white text-xl">✕</button>
+              <button onClick={() => { setShowModal(false); setSustituto(null) }} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-xl">✕</button>
             </div>
 
             {selectedDay.notas && (
@@ -563,22 +563,22 @@ function MiPlanContent() {
 
             {notasCoach.length > 0 && (
               <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl p-3 mb-4">
-                <p className="text-xs text-brand-400 font-semibold mb-1">💬 Tu coach dice:</p>
-                {notasCoach.map((n, i) => <p key={i} className="text-sm text-slate-300">{n}</p>)}
+                <p className="text-xs text-brand-600 dark:text-brand-400 font-semibold mb-1">💬 Tu coach dice:</p>
+                {notasCoach.map((n, i) => <p key={i} className="text-sm text-slate-600 dark:text-slate-300">{n}</p>)}
               </div>
             )}
 
             <div className="space-y-2 mb-5">
               {selectedDay.ejercicios.map((ej, i) => (
-                <div key={i} className="py-2.5 border-b border-white/5 last:border-0">
+                <div key={i} className="py-2.5 border-b border-slate-200 dark:border-white/5 last:border-0">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{ej.nombre}</p>
-                      {ej.notas && <p className="text-xs text-slate-500 mt-0.5">{ej.notas}</p>}
+                      <p className="text-sm font-medium text-slate-800 dark:text-white">{ej.nombre}</p>
+                      {ej.notas && <p className="text-xs text-slate-600 dark:text-slate-500 mt-0.5">{ej.notas}</p>}
                     </div>
                     <div className="ml-4 text-right flex-shrink-0">
-                      <p className="text-sm text-brand-400 font-semibold">{ej.series}×{ej.repeticiones}</p>
-                      <p className="text-xs text-slate-500">⏸ {ej.descanso_seg}s</p>
+                      <p className="text-sm text-brand-600 dark:text-brand-400 font-semibold">{ej.series}×{ej.repeticiones}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-500">⏸ {ej.descanso_seg}s</p>
                     </div>
                   </div>
                   <div className="mt-2 flex gap-3">
@@ -594,14 +594,14 @@ function MiPlanContent() {
                   {sustituto?.idx === i && (
                     <div className="mt-3 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20">
                       {sustituto.loading ? (
-                        <p className="text-xs text-slate-500">Buscando alternativa...</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-500">Buscando alternativa...</p>
                       ) : (
                         <>
                           <p className="text-xs text-brand-400 font-semibold mb-1">Alternativa sugerida:</p>
-                          <p className="text-sm font-medium">{sustituto.alternativa.nombre}</p>
+                          <p className="text-sm font-medium text-slate-800 dark:text-white">{sustituto.alternativa.nombre}</p>
                           <p className="text-xs text-brand-400 mt-0.5">{sustituto.alternativa.series}×{sustituto.alternativa.repeticiones} · ⏸ {sustituto.alternativa.descanso_seg}s</p>
                           {sustituto.alternativa.notas && <p className="text-xs text-slate-500 mt-1">{sustituto.alternativa.notas}</p>}
-                          <button onClick={() => setSustituto(null)} className="mt-2 text-xs text-slate-500 hover:text-white">Cerrar</button>
+                          <button onClick={() => setSustituto(null)} className="mt-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white">Cerrar</button>
                         </>
                       )}
                     </div>
@@ -617,7 +617,7 @@ function MiPlanContent() {
                   <span>▶</span> Modo entrenamiento en vivo
                 </button>
                 <div className="mb-4">
-                  <p className="text-sm text-slate-400 mb-2">¿Cómo te has sentido? ({sensacion}/5)</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">¿Cómo te has sentido? ({sensacion}/5)</p>
                   <div className="flex gap-2 justify-center text-2xl">
                     {['😓','😐','🙂','😊','🔥'].map((emoji, i) => (
                       <button key={i} onClick={() => setSensacion(i+1)}
@@ -636,8 +636,8 @@ function MiPlanContent() {
 
             {isLogCompleted(activeWeek, selectedDay.dia) && (
               <div className="text-center py-4">
-                <p className="text-brand-400 font-bold text-lg">✅ ¡Ya completaste esta sesión!</p>
-                <p className="text-slate-500 text-sm mt-1">Sigue así, campeón 💪</p>
+                <p className="text-brand-600 dark:text-brand-400 font-bold text-lg">✅ ¡Ya completaste esta sesión!</p>
+                <p className="text-slate-600 dark:text-slate-500 text-sm mt-1">Sigue así, campeón 💪</p>
               </div>
             )}
           </div>
@@ -650,7 +650,7 @@ function MiPlanContent() {
             <p className="text-brand-400 text-sm font-bold mb-2">¡Logro desbloqueado!</p>
             <div className="text-6xl mb-3">{logroParaCompartir.icon}</div>
             <h3 className="text-xl font-black mb-4">{logroParaCompartir.label}</h3>
-            <p className="text-slate-500 text-sm mb-5">Comparte tu progreso con el mundo 💪</p>
+            <p className="text-slate-600 dark:text-slate-500 text-sm mb-5">Comparte tu progreso con el mundo 💪</p>
             <div className="flex gap-3">
               <a href={`https://wa.me/?text=${encodeURIComponent(`¡Acabo de desbloquear "${logroParaCompartir.label}" en PACGYM! 💪`)}`}
                 target="_blank" rel="noopener noreferrer"
@@ -664,7 +664,7 @@ function MiPlanContent() {
                 Copiar
               </button>
             </div>
-            <button onClick={() => setLogroParaCompartir(null)} className="mt-4 text-slate-500 hover:text-white text-sm">Cerrar</button>
+              <button onClick={() => setLogroParaCompartir(null)} className="mt-4 text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm">Cerrar</button>
           </div>
         </div>
       )}
@@ -672,7 +672,7 @@ function MiPlanContent() {
       {liveMode && selectedDay && (
         <div className="fixed inset-0 z-[70] bg-slate-950 flex flex-col items-center justify-center px-6">
           <button onClick={() => { setLiveMode(false); setShowModal(true) }}
-            className="absolute top-4 right-4 text-slate-500 hover:text-white text-2xl z-10">✕</button>
+            className="absolute top-4 right-4 text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-2xl z-10">✕</button>
 
           {livePhase === 'work' ? (
             <>
@@ -684,7 +684,7 @@ function MiPlanContent() {
                 {selectedDay.ejercicios[liveExIdx]?.series}×{selectedDay.ejercicios[liveExIdx]?.repeticiones}
               </p>
               {selectedDay.ejercicios[liveExIdx]?.notas && (
-                <p className="text-slate-500 text-sm mb-6 max-w-md text-center">{selectedDay.ejercicios[liveExIdx].notas}</p>
+                <p className="text-slate-600 dark:text-slate-500 text-sm mb-6 max-w-md text-center">{selectedDay.ejercicios[liveExIdx].notas}</p>
               )}
               <button onClick={advanceLivePhase}
                 className="w-full max-w-xs py-5 bg-brand-500 hover:bg-brand-400 text-black font-black rounded-2xl text-lg">
@@ -693,10 +693,10 @@ function MiPlanContent() {
             </>
           ) : (
             <>
-              <p className="text-slate-500 text-sm mb-2">Descanso</p>
+              <p className="text-slate-600 dark:text-slate-500 text-sm mb-2">Descanso</p>
               <p className="text-7xl font-black text-brand-400 mb-4">{restSeconds}</p>
               <p className="text-slate-500 text-sm">siguiente serie en...</p>
-              <button onClick={advanceLivePhase} className="mt-6 text-slate-500 hover:text-white text-sm">Saltar descanso →</button>
+              <button onClick={advanceLivePhase} className="mt-6 text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm">Saltar descanso →</button>
             </>
           )}
         </div>
@@ -706,8 +706,8 @@ function MiPlanContent() {
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4">
           <div className="w-full max-w-lg">
             <div className="flex justify-between items-center mb-2">
-              <p className="text-sm text-slate-400 truncate">{videoModal.nombre}</p>
-              <button onClick={() => setVideoModal(null)} className="text-slate-500 hover:text-white text-xl">✕</button>
+              <p className="text-sm text-slate-600 dark:text-slate-400 truncate">{videoModal.nombre}</p>
+              <button onClick={() => setVideoModal(null)} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-xl">✕</button>
             </div>
             {videoModal.videoId ? (
               <div className="aspect-video rounded-xl overflow-hidden bg-black">
@@ -722,7 +722,7 @@ function MiPlanContent() {
               <div className="aspect-video rounded-xl bg-white/5 flex items-center justify-center">
                 <div className="text-center">
                   <div className="text-4xl mb-2 animate-pulse">▶</div>
-                  <p className="text-slate-500 text-sm">Buscando vídeo...</p>
+                  <p className="text-slate-600 dark:text-slate-500 text-sm">Buscando vídeo...</p>
                 </div>
               </div>
             )}
@@ -739,7 +739,7 @@ export default function MiPlanPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-3 animate-bounce">💪</div>
-          <p className="text-slate-500 text-sm">Cargando tu plan...</p>
+          <p className="text-slate-600 dark:text-slate-500 text-sm">Cargando tu plan...</p>
         </div>
       </div>
     }>
@@ -754,9 +754,9 @@ function StatCard({ icon, value, label, unit, highlight = false }: {
   return (
     <div className={`glass rounded-xl p-3 text-center ${highlight ? 'border border-brand-500/30' : ''}`}>
       <div className="text-xl mb-1">{icon}</div>
-      <div className={`text-2xl font-black ${highlight ? 'text-brand-400' : 'text-white'}`}>{value}</div>
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className="text-xs text-slate-600">{unit}</div>
+      <div className={`text-2xl font-black ${highlight ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-white'}`}>{value}</div>
+      <div className="text-xs text-slate-600 dark:text-slate-500">{label}</div>
+      <div className="text-xs text-slate-600 dark:text-slate-500">{unit}</div>
     </div>
   )
 }
@@ -765,7 +765,7 @@ function Badge({ icon, label }: { icon: string; label: string }) {
   return (
     <div className="flex items-center gap-1.5 bg-brand-500/10 border border-brand-500/20 px-3 py-1.5 rounded-full">
       <span className="text-sm">{icon}</span>
-      <span className="text-xs text-brand-300 font-medium">{label}</span>
+      <span className="text-xs text-brand-700 dark:text-brand-300 font-medium">{label}</span>
     </div>
   )
 }

@@ -217,7 +217,7 @@ export default function ConfigurarPage() {
 
   if (!client) return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-slate-500">Cargando...</p>
+      <p className="text-slate-600 dark:text-slate-500">Cargando...</p>
     </div>
   )
 
@@ -248,13 +248,13 @@ export default function ConfigurarPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <button onClick={() => router.push(`/admin/clientes/${id}`)}
-            className="text-slate-500 hover:text-white text-sm mb-2 flex items-center gap-1">
+            className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm mb-2 flex items-center gap-1">
             ← Ficha del cliente
           </button>
-          <h1 className="text-xl font-black" style={{ fontFamily: 'Syne, sans-serif' }}>
+          <h1 className="text-xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
             🎛️ Configurador de entrenamiento
           </h1>
-          <p className="text-slate-500 text-sm">{client.nombre} · {client.objetivo} · {client.nivel}</p>
+          <p className="text-slate-600 dark:text-slate-500 text-sm">{client.nombre} · {client.objetivo} · {client.nivel}</p>
         </div>
 
         {/* Generate button */}
@@ -272,19 +272,19 @@ export default function ConfigurarPage() {
       <div className="glass rounded-2xl p-4 mb-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <p className="text-sm font-semibold text-brand-400 mb-1">🤖 Sugerencia de IA</p>
+            <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-1">🤖 Sugerencia de IA</p>
             {!suggestion && !loadingAI && (
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-600 dark:text-slate-500 text-sm">
                 Pulsa "Analizar perfil" para que la IA sugiera la configuración óptima para {client.nombre.split(' ')[0]}.
                 Luego puedes ajustar manualmente con los sliders.
               </p>
             )}
             {loadingAI && (
-              <p className="text-slate-400 text-sm animate-pulse">Analizando perfil con IA...</p>
+              <p className="text-slate-600 dark:text-slate-400 text-sm animate-pulse">Analizando perfil con IA...</p>
             )}
             {suggestion && (
               <div>
-                <p className="text-sm text-slate-300 mb-2">{suggestion.razonamiento}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{suggestion.razonamiento}</p>
                 {suggestion.pack_sugerido_nombre && (
                   <p className="text-xs text-brand-400">
                     📦 Pack sugerido: <strong>{suggestion.pack_sugerido_nombre}</strong>
@@ -304,12 +304,12 @@ export default function ConfigurarPage() {
           </div>
           <div className="flex flex-col gap-2 flex-shrink-0">
             <button onClick={requestAISuggestion} disabled={loadingAI}
-              className="px-4 py-2 glass hover:bg-white/10 rounded-xl text-sm font-medium transition-all disabled:opacity-50 whitespace-nowrap">
+              className="px-4 py-2 glass hover:bg-slate-200/50 dark:hover:bg-white/10 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-all disabled:opacity-50 whitespace-nowrap">
               {loadingAI ? '⏳ Analizando...' : '🔍 Analizar perfil'}
             </button>
             {suggestion && (
               <button onClick={applySuggestion}
-                className="px-4 py-2 bg-brand-500/20 hover:bg-brand-500/30 border border-brand-500/30 text-brand-400 rounded-xl text-sm font-medium transition-all whitespace-nowrap">
+                className="px-4 py-2 bg-brand-500/20 hover:bg-brand-500/30 border border-brand-500/30 text-brand-600 dark:text-brand-400 rounded-xl text-sm font-medium transition-all whitespace-nowrap">
                 ✅ Aplicar sugerencia
               </button>
             )}
@@ -326,7 +326,7 @@ export default function ConfigurarPage() {
         ] as const).map(([key, label]) => (
           <button key={key} onClick={() => setActiveSection(key)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              activeSection === key ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+              activeSection === key ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/10'
             }`}>
             {label}
           </button>
@@ -338,7 +338,7 @@ export default function ConfigurarPage() {
         <div className="space-y-3">
           {/* Visualización circular simple */}
           <div className="glass rounded-2xl p-5 mb-2">
-            <p className="text-xs text-slate-500 mb-3 uppercase tracking-wider">Distribución actual</p>
+            <p className="text-xs text-slate-600 dark:text-slate-500 mb-3 uppercase tracking-wider">Distribución actual</p>
             <div className="flex gap-2 flex-wrap">
               {modules.map(m => (
                 <div key={m.id} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
@@ -363,7 +363,7 @@ export default function ConfigurarPage() {
 
           {/* Notas del coach */}
           <div className="glass rounded-2xl p-5 mt-4">
-            <label className="block text-sm text-slate-400 mb-2">
+            <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">
               💬 Instrucciones adicionales para la IA (opcional)
             </label>
             <textarea
@@ -381,7 +381,7 @@ export default function ConfigurarPage() {
       {activeSection === 'sesion' && (
         <div className="space-y-4">
           <div className="glass rounded-2xl p-5">
-            <p className="text-xs text-brand-400 font-semibold uppercase tracking-wider mb-4">Estructura del plan</p>
+            <p className="text-xs text-brand-600 dark:text-brand-400 font-semibold uppercase tracking-wider mb-4">Estructura del plan</p>
 
             <div className="grid grid-cols-2 gap-5">
               <SliderField
@@ -399,7 +399,7 @@ export default function ConfigurarPage() {
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm text-slate-400 mb-2">Tipo de progresión</label>
+              <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">Tipo de progresión</label>
               <div className="grid grid-cols-3 gap-2">
                 {([
                   ['lineal', '📈', 'Lineal', 'Carga constante semana a semana'],
@@ -410,10 +410,10 @@ export default function ConfigurarPage() {
                     className={`p-3 rounded-xl text-left transition-all ${
                       session.progresion === val
                         ? 'bg-brand-500/20 border border-brand-500/40'
-                        : 'glass hover:bg-white/5'
+                        : 'glass hover:bg-slate-100/50 dark:hover:bg-white/5'
                     }`}>
                     <p className="text-sm font-bold">{icon} {label}</p>
-                    <p className="text-xs text-slate-500 mt-1">{desc}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-500 mt-1">{desc}</p>
                   </button>
                 ))}
               </div>
@@ -440,8 +440,8 @@ export default function ConfigurarPage() {
 
             <div className="mt-5">
               <label className="block text-sm text-slate-400 mb-3">
-                RPE objetivo: <span className="text-white font-bold">{session.rpe_objetivo}/10</span>
-                <span className="text-slate-500 ml-2">({RPE_LABELS[session.rpe_objetivo]})</span>
+                RPE objetivo: <span className="text-slate-800 dark:text-white font-bold">{session.rpe_objetivo}/10</span>
+                <span className="text-slate-600 dark:text-slate-500 ml-2">({RPE_LABELS[session.rpe_objetivo]})</span>
               </label>
               <div className="relative">
                 <input type="range" min={1} max={10} value={session.rpe_objetivo}
@@ -490,7 +490,7 @@ export default function ConfigurarPage() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {packs.map((pack, idx) => (
               <button key={pack.id || idx} onClick={() => applyPack(pack)}
-                className={`glass rounded-2xl p-4 text-left hover:bg-white/[0.07] transition-all ${
+                className={`glass rounded-2xl p-4 text-left hover:bg-slate-100/50 dark:hover:bg-white/[0.07] transition-all ${
                   selectedPackNombre === pack.nombre ? 'border border-brand-500/50 bg-brand-500/5' : ''
                 }`}>
                 <div className="flex items-start justify-between mb-2">
@@ -500,7 +500,7 @@ export default function ConfigurarPage() {
                   )}
                 </div>
                 <p className="font-bold text-sm">{pack.nombre}</p>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{pack.descripcion}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-500 mt-1 line-clamp-2">{pack.descripcion}</p>
 
                 {/* Mini módulos (siempre los 8 tipos en orden alfabético para comparar entre packs) */}
                 <div className="mt-3 flex flex-wrap gap-1">
@@ -579,7 +579,7 @@ function ModuleSlider({
           <span className="text-xl">{module.icon}</span>
           <div>
             <p className="font-semibold text-sm">{module.label}</p>
-            <p className="text-xs text-slate-500">{module.description}</p>
+            <p className="text-xs text-slate-600 dark:text-slate-500">{module.description}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -592,7 +592,7 @@ function ModuleSlider({
             className={`text-sm px-2 py-1 rounded-lg transition-all ${
               module.locked
                 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                : 'text-slate-600 hover:text-slate-400 glass'
+                : 'text-slate-600 dark:hover:text-slate-400 glass'
             }`}
             title={module.locked ? 'Bloqueado (la IA no lo cambia)' : 'Bloquear para que la IA no lo cambie'}>
             {module.locked ? '🔒' : '🔓'}
@@ -622,8 +622,8 @@ function ModuleSlider({
 
       {/* Intensidad badge */}
       <div className="mt-2 flex gap-2">
-        {isEmpty && <span className="text-xs text-slate-600 bg-white/5 px-2 py-0.5 rounded-full">Sin incluir</span>}
-        {!isEmpty && module.value < 30 && <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-slate-500">Apoyo mínimo</span>}
+        {isEmpty && <span className="text-xs text-slate-600 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full">Sin incluir</span>}
+        {!isEmpty && module.value < 30 && <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-500">Apoyo mínimo</span>}
         {module.value >= 30 && module.value < 60 && <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: `${module.color}15`, color: module.color }}>Presencia moderada</span>}
         {module.value >= 60 && module.value < 80 && <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: `${module.color}20`, color: module.color }}>Componente principal</span>}
         {module.value >= 80 && <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ backgroundColor: `${module.color}25`, color: module.color }}>⭐ Foco prioritario</span>}
@@ -643,7 +643,7 @@ function SliderField({
   const pct = ((value - min) / (max - min)) * 100
   return (
     <div>
-      <label className="block text-sm text-slate-400 mb-2">{label}</label>
+      <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">{label}</label>
       <input type="range" min={min} max={max} step={step} value={value}
         onChange={e => onChange(+e.target.value)}
         className="w-full accent-brand-500"

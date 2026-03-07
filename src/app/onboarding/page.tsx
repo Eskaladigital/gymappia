@@ -79,13 +79,13 @@ export default function OnboardingPage() {
     <div className="min-h-screen px-4 py-8 max-w-xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <button onClick={() => router.back()} className="text-slate-500 hover:text-white text-sm mb-4 flex items-center gap-2">
+        <button onClick={() => router.back()} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm mb-4 flex items-center gap-2">
           ← Volver
         </button>
-        <h1 className="text-2xl font-black" style={{ fontFamily: 'Syne, sans-serif' }}>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
           Nuevo cliente
         </h1>
-        <p className="text-slate-500 text-sm">Rellena los datos para generar el plan con IA</p>
+        <p className="text-slate-600 dark:text-slate-500 text-sm">Rellena los datos para generar el plan con IA</p>
       </div>
 
       {/* Steps */}
@@ -111,7 +111,7 @@ export default function OnboardingPage() {
 
         {step === 1 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-bold mb-4">👤 Datos personales</h2>
+            <h2 className="text-lg font-bold mb-4 text-slate-800 dark:text-white">👤 Datos personales</h2>
             <Field label="Nombre completo *">
               <input type="text" value={profile.nombre || ''} onChange={e => update('nombre', e.target.value)}
                 className="input-field" placeholder="Ana García" />
@@ -139,7 +139,7 @@ export default function OnboardingPage() {
                 {(['hombre', 'mujer', 'otro'] as const).map(s => (
                   <button key={s} onClick={() => update('sexo', s)}
                     className={`flex-1 py-2 rounded-lg text-sm capitalize transition-all ${
-                      profile.sexo === s ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                      profile.sexo === s ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                     }`}>
                     {s}
                   </button>
@@ -151,7 +151,7 @@ export default function OnboardingPage() {
 
         {step === 2 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-bold mb-4">❤️ Salud y limitaciones</h2>
+            <h2 className="text-lg font-bold mb-4 text-slate-800 dark:text-white">❤️ Salud y limitaciones</h2>
             <Field label="¿Tienes lesiones o molestias físicas?">
               <textarea value={profile.lesiones || ''} onChange={e => update('lesiones', e.target.value)}
                 className="input-field resize-none" rows={3}
@@ -166,7 +166,7 @@ export default function OnboardingPage() {
               <input type="text" value={profile.medicacion || ''} onChange={e => update('medicacion', e.target.value)}
                 className="input-field" placeholder="Deja vacío si ninguna" />
             </Field>
-            <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl p-4 text-sm text-brand-300">
+            <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl p-4 text-sm text-brand-700 dark:text-brand-300">
               💡 Esta información es confidencial y solo se usa para adaptar los ejercicios a tu seguridad.
             </div>
           </div>
@@ -208,12 +208,12 @@ export default function OnboardingPage() {
 
         {step === 4 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-bold mb-4">📅 Disponibilidad</h2>
+            <h2 className="text-lg font-bold mb-4 text-slate-800 dark:text-white">📅 Disponibilidad</h2>
             <Field label={`Sesiones por semana: ${profile.sesiones_semana}`}>
               <input type="range" min={1} max={7} value={profile.sesiones_semana || 3}
                 onChange={e => update('sesiones_semana', +e.target.value)}
                 className="w-full accent-brand-500" />
-              <div className="flex justify-between text-xs text-slate-500 mt-1">
+              <div className="flex justify-between text-xs text-slate-600 dark:text-slate-500 mt-1">
                 <span>1 día</span><span>4 días</span><span>7 días</span>
               </div>
             </Field>
@@ -221,7 +221,7 @@ export default function OnboardingPage() {
               <input type="range" min={20} max={120} step={5} value={profile.minutos_sesion || 45}
                 onChange={e => update('minutos_sesion', +e.target.value)}
                 className="w-full accent-brand-500" />
-              <div className="flex justify-between text-xs text-slate-500 mt-1">
+              <div className="flex justify-between text-xs text-slate-600 dark:text-slate-500 mt-1">
                 <span>20 min</span><span>60 min</span><span>120 min</span>
               </div>
             </Field>
@@ -231,7 +231,7 @@ export default function OnboardingPage() {
                   <button key={dia} onClick={() => toggleDia(dia)}
                     className={`w-9 h-9 rounded-lg text-xs font-bold transition-all ${
                       profile.dias_preferidos?.includes(dia)
-                        ? 'bg-brand-500 text-black' : 'glass hover:bg-white/10 text-slate-400'
+                        ? 'bg-brand-500 text-black' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400'
                     }`}>
                     {DIAS_LABELS[dia]}
                   </button>
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
                 {(['mañana', 'tarde', 'noche'] as const).map(h => (
                   <button key={h} onClick={() => update('horario_preferido', h)}
                     className={`flex-1 py-2 rounded-lg text-sm capitalize transition-all ${
-                      profile.horario_preferido === h ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                      profile.horario_preferido === h ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                     }`}>
                     {h === 'mañana' ? '🌅' : h === 'tarde' ? '🌤️' : '🌙'} {h}
                   </button>
@@ -255,7 +255,7 @@ export default function OnboardingPage() {
 
         {step === 5 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-bold mb-4">🏋️ Entrenamiento</h2>
+            <h2 className="text-lg font-bold mb-4 text-slate-800 dark:text-white">🏋️ Entrenamiento</h2>
             <Field label="¿Dónde entrenas? *">
               <div className="grid grid-cols-2 gap-2">
                 {([
@@ -266,7 +266,7 @@ export default function OnboardingPage() {
                 ] as [TrainingLocation, string][]).map(([val, label]) => (
                   <button key={val} onClick={() => update('lugar', val)}
                     className={`p-3 rounded-xl text-sm font-medium transition-all ${
-                      profile.lugar === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                      profile.lugar === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                     }`}>
                     {label}
                   </button>
@@ -286,7 +286,7 @@ export default function OnboardingPage() {
                 ] as [FitnessLevel, string][]).map(([val, label]) => (
                   <button key={val} onClick={() => update('nivel', val)}
                     className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
-                      profile.nivel === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-white/10'
+                      profile.nivel === val ? 'bg-brand-500 text-black font-bold' : 'glass hover:bg-slate-100/50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
                     }`}>
                     {label}
                   </button>
@@ -306,7 +306,7 @@ export default function OnboardingPage() {
 
         {step === 6 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-bold mb-4">🧘 Estilo de vida</h2>
+            <h2 className="text-lg font-bold mb-4 text-slate-800 dark:text-white">🧘 Estilo de vida</h2>
             <Field label="¿A qué te dedicas? (tipo de trabajo)">
               <input type="text" value={profile.tipo_trabajo || ''} onChange={e => update('tipo_trabajo', e.target.value)}
                 className="input-field" placeholder="Ej: Trabajo de oficina, trabajo físico, autónomo..." />
@@ -315,7 +315,7 @@ export default function OnboardingPage() {
               <input type="range" min={4} max={10} value={profile.horas_sueno || 7}
                 onChange={e => update('horas_sueno', +e.target.value)}
                 className="w-full accent-brand-500" />
-              <div className="flex justify-between text-xs text-slate-500 mt-1">
+              <div className="flex justify-between text-xs text-slate-600 dark:text-slate-500 mt-1">
                 <span>4h</span><span>7h</span><span>10h</span>
               </div>
             </Field>
@@ -323,7 +323,7 @@ export default function OnboardingPage() {
               <input type="range" min={1} max={10} value={profile.nivel_estres || 5}
                 onChange={e => update('nivel_estres', +e.target.value)}
                 className="w-full accent-brand-500" />
-              <div className="flex justify-between text-xs text-slate-500 mt-1">
+              <div className="flex justify-between text-xs text-slate-600 dark:text-slate-500 mt-1">
                 <span>Muy bajo</span><span>Moderado</span><span>Muy alto</span>
               </div>
             </Field>
@@ -350,7 +350,7 @@ export default function OnboardingPage() {
       <div className="flex gap-3 mt-6">
         {step > 1 && (
           <button onClick={() => setStep(s => s - 1)}
-            className="flex-1 py-3 glass hover:bg-white/10 rounded-xl text-sm font-medium transition-all">
+            className="flex-1 py-3 glass hover:bg-slate-100/50 dark:hover:bg-white/10 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-all">
             ← Anterior
           </button>
         )}
@@ -367,7 +367,7 @@ export default function OnboardingPage() {
         )}
       </div>
 
-      <p className="text-center text-xs text-slate-600 mt-4">
+      <p className="text-center text-xs text-slate-600 dark:text-slate-500 mt-4">
         Paso {step} de {STEPS.length}
       </p>
     </div>
@@ -377,7 +377,7 @@ export default function OnboardingPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-sm text-slate-400 mb-2">{label}</label>
+      <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">{label}</label>
       {children}
     </div>
   )

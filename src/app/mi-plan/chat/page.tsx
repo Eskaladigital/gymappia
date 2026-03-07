@@ -94,26 +94,26 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen flex flex-col max-w-lg mx-auto">
       {/* Header */}
-      <div className="px-4 py-4 glass border-b border-white/5 flex items-center gap-3 flex-shrink-0">
-        <button onClick={() => router.push('/mi-plan')} className="text-slate-500 hover:text-white">←</button>
+      <div className="px-4 py-4 glass border-b border-slate-200 dark:border-white/5 flex items-center gap-3 flex-shrink-0">
+        <button onClick={() => router.push('/mi-plan')} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white">←</button>
         <div className="w-9 h-9 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center">
           <span className="text-lg">💪</span>
         </div>
         <div>
-          <p className="font-bold text-sm">Tu Coach PACGYM</p>
-          <p className="text-xs text-brand-400">● Disponible ahora</p>
+          <p className="font-bold text-sm text-slate-800 dark:text-white">Tu Coach PACGYM</p>
+          <p className="text-xs text-brand-600 dark:text-brand-400">● Disponible ahora</p>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {loading && <p className="text-center text-slate-500 text-sm">Cargando...</p>}
+        {loading && <p className="text-center text-slate-600 dark:text-slate-500 text-sm">Cargando...</p>}
 
         {!loading && messages.length === 0 && (
           <div className="text-center py-8">
             <div className="text-4xl mb-3">💬</div>
-            <p className="text-slate-400 text-sm font-medium">¡Hola, {client?.nombre?.split(' ')[0]}!</p>
-            <p className="text-slate-500 text-xs mt-1">Pregúntame cualquier cosa sobre tu entrenamiento</p>
+            <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">¡Hola, {client?.nombre?.split(' ')[0]}!</p>
+            <p className="text-slate-600 dark:text-slate-500 text-xs mt-1">Pregúntame cualquier cosa sobre tu entrenamiento</p>
             {/* Quick suggestions */}
             <div className="mt-4 space-y-2">
               {[
@@ -123,7 +123,7 @@ export default function ChatPage() {
                 '¿Cuánto peso debo usar?',
               ].map(s => (
                 <button key={s} onClick={() => setInput(s)}
-                  className="block w-full text-left glass hover:bg-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-300 transition-all">
+                  className="block w-full text-left glass hover:bg-slate-100/50 dark:hover:bg-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 transition-all">
                   {s}
                 </button>
               ))}
@@ -141,7 +141,7 @@ export default function ChatPage() {
             <div className={`max-w-[78%] rounded-2xl px-4 py-3 ${
               msg.remitente === 'client'
                 ? 'bg-brand-500 text-black rounded-br-sm'
-                : 'glass text-white rounded-bl-sm'
+                : 'glass text-slate-800 dark:text-white rounded-bl-sm'
             }`}>
               {msg.remitente === 'ai' && msg.mensaje === '...' ? (
                 <div className="flex gap-1 py-1">
@@ -165,7 +165,7 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-4 glass border-t border-white/5 flex gap-3 flex-shrink-0">
+      <div className="px-4 py-4 glass border-t border-slate-200 dark:border-white/5 flex gap-3 flex-shrink-0">
         <input
           type="text"
           value={input}

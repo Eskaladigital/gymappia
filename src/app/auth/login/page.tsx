@@ -58,23 +58,23 @@ function LoginContent() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-2">
             <span className="text-xl">💪</span>
-            <span className="text-xl font-black" style={{ fontFamily: 'Syne, sans-serif' }}>
-              PAC<span className="text-brand-400">GYM</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
+              PAC<span className="text-brand-500 dark:text-brand-400">GYM</span>
             </span>
           </div>
-          <h2 className="text-2xl font-black">Bienvenido de vuelta</h2>
-          <p className="text-slate-500 text-sm mt-1">Accede a tu plan de entrenamiento</p>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">Bienvenido de vuelta</h2>
+          <p className="text-slate-600 dark:text-slate-500 text-sm mt-1">Accede a tu plan de entrenamiento</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input type="hidden" name="redirect" value={redirect} />
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Email</label>
+            <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">Email</label>
             <input type="email" name="email" required
               className="input-field" placeholder="tu@email.com" />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Contraseña</label>
+            <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">Contraseña</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -86,7 +86,7 @@ function LoginContent() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-300 transition-colors p-1"
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -106,9 +106,9 @@ function LoginContent() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-slate-500 mt-5">
+        <p className="text-center text-sm text-slate-600 dark:text-slate-500 mt-5">
           ¿No tienes cuenta?{' '}
-          <Link href="/start" className="text-brand-400 hover:underline">Crea tu plan</Link>
+          <Link href="/start" className="text-brand-600 dark:text-brand-400 hover:underline">Crea tu plan</Link>
         </p>
       </div>
     </div>

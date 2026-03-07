@@ -141,7 +141,7 @@ export default function PlanEditor({ plan, onSave }: PlanEditorProps) {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-500 uppercase tracking-wider">✏️ Editor de plan</p>
+        <p className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider">✏️ Editor de plan</p>
         <div className="flex items-center gap-2">
           {dirty && (
             <span className="text-xs text-amber-400 animate-pulse">● Cambios sin guardar</span>
@@ -172,7 +172,7 @@ export default function PlanEditor({ plan, onSave }: PlanEditorProps) {
             className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
               activeWeek === s.semana
                 ? 'bg-brand-500 text-black font-bold'
-                : 'glass text-slate-400 hover:bg-white/10'
+                : 'glass text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/10'
             }`}
           >
             Sem {s.semana}
@@ -196,7 +196,7 @@ export default function PlanEditor({ plan, onSave }: PlanEditorProps) {
               markDirty()
             }}
             placeholder="Objetivo de la semana..."
-            className="flex-1 bg-transparent text-sm text-slate-300 placeholder-slate-600 outline-none"
+            className="flex-1 bg-transparent text-sm text-slate-700 dark:text-slate-300 placeholder-slate-500 dark:placeholder-slate-600 outline-none"
           />
         </div>
       )}
@@ -277,8 +277,8 @@ function DayEditor({
             {DIA_ABBREV[day.dia] ?? day.dia.slice(0,3)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm">{DIA_LABEL[day.dia] ?? day.dia}</p>
-            <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min}min · {day.ejercicios.length} ejercicios</p>
+            <p className="font-semibold text-sm text-slate-800 dark:text-white">{DIA_LABEL[day.dia] ?? day.dia}</p>
+            <p className="text-xs text-slate-600 dark:text-slate-500">{day.tipo} · {day.duracion_min}min · {day.ejercicios.length} ejercicios</p>
           </div>
           <span className="text-slate-600 text-sm">{expanded ? '▲' : '▼'}</span>
         </button>
@@ -412,12 +412,12 @@ function ExerciseRow({ exercise, exIdx, total, onChange, onRemove, onMove }: Exe
           <button
             onClick={() => onMove('up')}
             disabled={exIdx === 0}
-            className="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-white disabled:opacity-20 text-xs leading-none rounded hover:bg-white/10"
+            className="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-white disabled:opacity-20 text-xs leading-none rounded hover:bg-slate-200/50 dark:hover:bg-white/10"
           >▲</button>
           <button
             onClick={() => onMove('down')}
             disabled={exIdx === total - 1}
-            className="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-white disabled:opacity-20 text-xs leading-none rounded hover:bg-white/10"
+            className="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-white disabled:opacity-20 text-xs leading-none rounded hover:bg-slate-200/50 dark:hover:bg-white/10"
           >▼</button>
         </div>
 

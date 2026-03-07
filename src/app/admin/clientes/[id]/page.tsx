@@ -126,10 +126,10 @@ function AdminClienteContent() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-slate-500">Cargando ficha...</p>
+      <p className="text-slate-600 dark:text-slate-500">Cargando ficha...</p>
     </div>
   )
-  if (!client) return <div className="min-h-screen flex items-center justify-center"><p>Cliente no encontrado</p></div>
+  if (!client) return <div className="min-h-screen flex items-center justify-center"><p className="text-slate-800 dark:text-white">Cliente no encontrado</p></div>
 
   const currentWeek = plan?.semanas.find(s => s.semana === activeWeek)
   const completadas = logs.filter(l => l.completado).length
@@ -149,23 +149,23 @@ function AdminClienteContent() {
         onConfirm={handleConfirmGenerate}
       />
       {/* Header */}
-      <button onClick={() => router.push('/admin')} className="text-slate-500 hover:text-white text-sm mb-5 flex items-center gap-2">
+      <button onClick={() => router.push('/admin')} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm mb-5 flex items-center gap-2">
         ← Admin
       </button>
 
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl border ${
-            client.status === 'active' ? 'bg-brand-500/20 border-brand-500/30 text-brand-400'
-            : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400'
+            client.status === 'active' ? 'bg-brand-500/20 border-brand-500/30 text-brand-600 dark:text-brand-400'
+            : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-600 dark:text-yellow-400'
           }`}>
             {client.nombre.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h1 className="text-xl font-black" style={{ fontFamily: 'Syne, sans-serif' }}>{client.nombre}</h1>
-            <p className="text-slate-500 text-sm">{client.email}</p>
+            <h1 className="text-xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>{client.nombre}</h1>
+            <p className="text-slate-600 dark:text-slate-500 text-sm">{client.email}</p>
             <span className={`text-xs px-2 py-0.5 rounded-full mt-1 inline-block ${
-              client.status === 'active' ? 'bg-brand-500/20 text-brand-400' : 'bg-yellow-500/10 text-yellow-400'
+              client.status === 'active' ? 'bg-brand-500/20 text-brand-700 dark:text-brand-400' : 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400'
             }`}>
               {client.status === 'pending' ? '⏳ Pendiente de aprobación' : '✅ Cliente activo'}
             </span>
@@ -187,7 +187,7 @@ function AdminClienteContent() {
                 🎛️ Configurar y generar plan
               </button>
               <button onClick={() => setShowConfirmModal(true)} disabled={generating}
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl text-xs transition-all disabled:opacity-50">
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 text-slate-800 dark:text-white font-medium rounded-xl text-xs transition-all disabled:opacity-50">
                 {generating ? '🤖 Generando...' : '⚡ Generar rápido'}
               </button>
             </div>
@@ -195,7 +195,7 @@ function AdminClienteContent() {
           {plan && (
             <button
               onClick={() => router.push(`/admin/clientes/${id}/configurar`)}
-              className="px-4 py-2 glass hover:bg-white/10 text-slate-400 font-medium rounded-xl text-xs transition-all">
+              className="px-4 py-2 glass hover:bg-slate-200/50 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 font-medium rounded-xl text-xs transition-all">
               🎛️ Reconfigurar plan
             </button>
           )}
@@ -207,7 +207,7 @@ function AdminClienteContent() {
         {(['ficha', 'plan', 'seguimiento'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2 rounded-xl text-sm font-medium capitalize transition-all ${
-              tab === t ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+              tab === t ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/10'
             }`}>
             {t === 'ficha' ? '👤 Ficha' : t === 'plan' ? '📋 Plan' : '📊 Seguimiento'}
           </button>
@@ -262,8 +262,8 @@ function AdminClienteContent() {
           {!plan ? (
             <div className="glass rounded-2xl p-8 text-center">
               <div className="text-4xl mb-4">📋</div>
-              <h3 className="font-bold mb-2">Sin plan generado</h3>
-              <p className="text-slate-500 text-sm mb-5">Genera el plan con IA para este cliente</p>
+              <h3 className="font-bold mb-2 text-slate-800 dark:text-white">Sin plan generado</h3>
+              <p className="text-slate-600 dark:text-slate-500 text-sm mb-5">Genera el plan con IA para este cliente</p>
               <button onClick={() => setShowConfirmModal(true)} disabled={generating}
                 className="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-sm disabled:opacity-50 transition-all">
                 {generating ? '🤖 Generando plan con IA...' : '🤖 Generar plan ahora'}
@@ -273,10 +273,10 @@ function AdminClienteContent() {
             <>
               {/* Info del plan */}
               <div className="glass rounded-2xl p-5 mb-4">
-                <h2 className="font-bold mb-1">{plan.titulo}</h2>
-                <p className="text-slate-400 text-sm">{plan.descripcion}</p>
+                <h2 className="font-bold mb-1 text-slate-900 dark:text-white">{plan.titulo}</h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm">{plan.descripcion}</p>
                 {plan.notas_entrenador && (
-                  <p className="text-sm text-brand-300 mt-3 pt-3 border-t border-white/5">
+                  <p className="text-sm text-brand-600 dark:text-brand-300 mt-3 pt-3 border-t border-slate-200 dark:border-white/5">
                     💬 {plan.notas_entrenador}
                   </p>
                 )}
@@ -294,8 +294,8 @@ function AdminClienteContent() {
                     onClick={() => setPlanView(key)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       planView === key
-                        ? 'bg-white/15 text-white font-bold'
-                        : 'glass text-slate-500 hover:bg-white/10'
+                        ? 'bg-brand-500/20 dark:bg-white/15 text-slate-800 dark:text-white font-bold'
+                        : 'glass text-slate-600 dark:text-slate-500 hover:bg-slate-200/50 dark:hover:bg-white/10'
                     }`}
                   >
                     {label}
@@ -310,7 +310,7 @@ function AdminClienteContent() {
                     {plan.semanas.map(s => (
                       <button key={s.semana} onClick={() => setActiveWeek(s.semana)}
                         className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                          activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-400 hover:bg-white/10'
+                          activeWeek === s.semana ? 'bg-brand-500 text-black font-bold' : 'glass text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/10'
                         }`}>
                         Sem {s.semana}
                       </button>
@@ -318,7 +318,7 @@ function AdminClienteContent() {
                   </div>
 
                   {currentWeek?.objetivo_semana && (
-                    <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-300">
+                    <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-brand-700 dark:text-brand-300">
                       🎯 {currentWeek.objetivo_semana}
                     </div>
                   )}
@@ -327,26 +327,26 @@ function AdminClienteContent() {
                     {currentWeek?.dias.map((day, idx) => (
                       <div key={idx} className="glass rounded-2xl overflow-hidden">
                         <button onClick={() => setActiveDay(activeDay?.dia === day.dia ? null : day)}
-                          className="w-full p-4 text-left hover:bg-white/5 transition-all">
+                          className="w-full p-4 text-left hover:bg-slate-100/50 dark:hover:bg-white/5 transition-all">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <span className="min-w-[2.5rem] px-1.5 py-1 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold">
+                              <span className="min-w-[2.5rem] px-1.5 py-1 rounded-lg bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xs font-bold">
                                 {DIA_ABBREV[day.dia] ?? day.dia.slice(0,3)}
                               </span>
                               <div>
-                                <p className="font-semibold">{DIA_LABEL[day.dia] ?? day.dia}</p>
-                                <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
+                                <p className="font-semibold text-slate-800 dark:text-white">{DIA_LABEL[day.dia] ?? day.dia}</p>
+                                <p className="text-xs text-slate-600 dark:text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
                               </div>
                             </div>
-                            <span className="text-slate-600">{activeDay?.dia === day.dia ? '▲' : '▼'}</span>
+                            <span className="text-slate-500 dark:text-slate-600">{activeDay?.dia === day.dia ? '▲' : '▼'}</span>
                           </div>
                         </button>
                         {activeDay?.dia === day.dia && (
                           <div className="px-4 pb-4 border-t border-white/5">
-                            {day.notas && <p className="text-xs text-amber-400 py-2">💡 {day.notas}</p>}
+                            {day.notas && <p className="text-xs text-amber-600 dark:text-amber-400 py-2">💡 {day.notas}</p>}
                             {/* Nota coach */}
                             <div className="mb-4 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20">
-                              <p className="text-xs text-brand-400 font-semibold mb-2">💬 Nota para el cliente (esta sesión)</p>
+                              <p className="text-xs text-brand-600 dark:text-brand-400 font-semibold mb-2">💬 Nota para el cliente (esta sesión)</p>
                               <div className="flex gap-2">
                                 <input type="text" value={notaSesion} onChange={e => setNotaSesion(e.target.value)}
                                   placeholder="Ej: Esta semana aumenta el peso en sentadilla"
@@ -373,18 +373,18 @@ function AdminClienteContent() {
                                 </button>
                               </div>
                               {coachMessages.filter(m => m.session_ref_semana === activeWeek && m.session_ref_dia === day.dia).map(m => (
-                                <p key={m.id} className="text-xs text-slate-400 mt-2 pt-2 border-t border-white/5">✓ {m.mensaje}</p>
+                                <p key={m.id} className="text-xs text-slate-600 dark:text-slate-400 mt-2 pt-2 border-t border-slate-200 dark:border-white/5">✓ {m.mensaje}</p>
                               ))}
                             </div>
                             <div className="space-y-2 mt-2">
                               {day.ejercicios.map((ej, i) => (
-                                <div key={i} className="flex justify-between items-start py-1.5 border-b border-white/5 last:border-0">
+                                <div key={i} className="flex justify-between items-start py-1.5 border-b border-slate-200 dark:border-white/5 last:border-0">
                                   <div>
-                                    <p className="text-sm font-medium">{ej.nombre}</p>
-                                    {ej.notas && <p className="text-xs text-slate-500">{ej.notas}</p>}
+                                    <p className="text-sm font-medium text-slate-800 dark:text-white">{ej.nombre}</p>
+                                    {ej.notas && <p className="text-xs text-slate-600 dark:text-slate-500">{ej.notas}</p>}
                                   </div>
-                                  <div className="ml-4 text-right text-xs text-slate-400">
-                                    <p className="text-brand-400 font-semibold">{ej.series}×{ej.repeticiones}</p>
+                                  <div className="ml-4 text-right text-xs text-slate-600 dark:text-slate-400">
+                                    <p className="text-brand-600 dark:text-brand-400 font-semibold">{ej.series}×{ej.repeticiones}</p>
                                     <p>⏸ {ej.descanso_seg}s</p>
                                   </div>
                                 </div>
@@ -422,8 +422,8 @@ function AdminClienteContent() {
 
               {plan.recomendaciones_nutricionales && planView === 'semanal' && (
                 <div className="glass rounded-2xl p-5 mt-4">
-                  <h3 className="font-bold mb-2">🥗 Nutrición</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{plan.recomendaciones_nutricionales}</p>
+                  <h3 className="font-bold mb-2 text-slate-800 dark:text-white">🥗 Nutrición</h3>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{plan.recomendaciones_nutricionales}</p>
                 </div>
               )}
             </>
@@ -436,33 +436,33 @@ function AdminClienteContent() {
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-3">
             <div className="glass rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-brand-400">{completadas}</p>
-              <p className="text-xs text-slate-500">Sesiones</p>
+              <p className="text-2xl font-black text-brand-600 dark:text-brand-400">{completadas}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-500">Sesiones</p>
             </div>
             <div className="glass rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-white">
+              <p className="text-2xl font-black text-slate-800 dark:text-white">
                 {logs.length > 0 ? (logs.reduce((a, l) => a + (l.sensacion || 0), 0) / logs.length).toFixed(1) : '-'}
               </p>
-              <p className="text-xs text-slate-500">Sensación media</p>
+              <p className="text-xs text-slate-600 dark:text-slate-500">Sensación media</p>
             </div>
             <div className="glass rounded-xl p-4 text-center">
-              <p className="text-2xl font-black text-white">
+              <p className="text-2xl font-black text-slate-800 dark:text-white">
                 {logs.reduce((a, l) => a + (l.puntos_ganados || 0), 0)}
               </p>
-              <p className="text-xs text-slate-500">Puntos ganados</p>
+              <p className="text-xs text-slate-600 dark:text-slate-500">Puntos ganados</p>
             </div>
           </div>
 
           <div className="glass rounded-2xl p-5 mb-4">
-            <h3 className="font-bold mb-3">📸 Fotos de progreso</h3>
+            <h3 className="font-bold mb-3 text-slate-800 dark:text-white">📸 Fotos de progreso</h3>
             {progressPhotos.length === 0 ? (
-              <p className="text-slate-500 text-sm">El cliente aún no ha subido fotos</p>
+              <p className="text-slate-600 dark:text-slate-500 text-sm">El cliente aún no ha subido fotos</p>
             ) : (
               <div className="grid grid-cols-4 gap-2">
                 {progressPhotos.map(p => (
-                  <div key={p.id} className="rounded-xl overflow-hidden bg-white/5">
+                  <div key={p.id} className="rounded-xl overflow-hidden bg-slate-100 dark:bg-white/5">
                     <img src={p.foto_url} alt={`Semana ${p.semana}`} className="w-full aspect-square object-cover" />
-                    <p className="text-xs text-slate-500 p-1">S{p.semana}{p.peso_kg ? ` · ${p.peso_kg}kg` : ''}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-500 p-1">S{p.semana}{p.peso_kg ? ` · ${p.peso_kg}kg` : ''}</p>
                   </div>
                 ))}
               </div>
@@ -470,15 +470,15 @@ function AdminClienteContent() {
           </div>
 
           <div className="glass rounded-2xl p-5 mb-4">
-            <h3 className="font-bold mb-3">💬 Mensajes al cliente</h3>
+            <h3 className="font-bold mb-3 text-slate-800 dark:text-white">💬 Mensajes al cliente</h3>
             {coachMessages.filter(m => m.remitente === 'coach').length === 0 ? (
-              <p className="text-slate-500 text-sm">No hay mensajes enviados</p>
+              <p className="text-slate-600 dark:text-slate-500 text-sm">No hay mensajes enviados</p>
             ) : (
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {coachMessages.filter(m => m.remitente === 'coach').map(m => (
-                  <div key={m.id} className="text-sm py-2 border-b border-white/5 last:border-0">
-                    <p>{m.mensaje}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                  <div key={m.id} className="text-sm py-2 border-b border-slate-200 dark:border-white/5 last:border-0">
+                    <p className="text-slate-800 dark:text-white">{m.mensaje}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-500 mt-0.5">
                       {m.session_ref_semana ? `Sem ${m.session_ref_semana} · ${m.session_ref_dia}` : 'General'}
                     </p>
                   </div>
@@ -488,18 +488,18 @@ function AdminClienteContent() {
           </div>
 
           <div className="glass rounded-2xl p-5">
-            <h3 className="font-bold mb-3">Historial de sesiones</h3>
+            <h3 className="font-bold mb-3 text-slate-800 dark:text-white">Historial de sesiones</h3>
             {logs.length === 0 ? (
-              <p className="text-slate-500 text-sm">Aún no hay sesiones completadas</p>
+              <p className="text-slate-600 dark:text-slate-500 text-sm">Aún no hay sesiones completadas</p>
             ) : (
               <div className="space-y-2">
                 {[...logs].sort((a,b) => b.fecha.localeCompare(a.fecha)).map(log => (
-                  <div key={log.id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                  <div key={log.id} className="flex items-center justify-between py-2 border-b border-slate-200 dark:border-white/5 last:border-0">
                     <div>
-                      <p className="text-sm font-medium capitalize">{log.dia_nombre} – Sem {log.semana}</p>
-                      <p className="text-xs text-slate-500">{log.fecha}</p>
+                      <p className="text-sm font-medium capitalize text-slate-800 dark:text-white">{log.dia_nombre} – Sem {log.semana}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-500">{log.fecha}</p>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
+                    <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
                       {log.sensacion && (
                         <span>{['😓','😐','🙂','😊','🔥'][log.sensacion - 1]}</span>
                       )}
@@ -532,7 +532,7 @@ export default function AdminClientePage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="glass rounded-2xl p-5">
-      <h3 className="text-xs text-brand-400 font-semibold uppercase tracking-wider mb-3">{title}</h3>
+      <h3 className="text-xs text-brand-600 dark:text-brand-400 font-semibold uppercase tracking-wider mb-3">{title}</h3>
       <div className="space-y-2">{children}</div>
     </div>
   )
@@ -545,8 +545,8 @@ function Grid({ children }: { children: React.ReactNode }) {
 function Info({ label, value, full = false }: { label: string; value: string | number; full?: boolean }) {
   return (
     <div className={full ? 'col-span-2' : ''}>
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-sm font-medium mt-0.5">{value}</p>
+      <p className="text-xs text-slate-600 dark:text-slate-500">{label}</p>
+      <p className="text-sm font-medium mt-0.5 text-slate-800 dark:text-white">{value}</p>
     </div>
   )
 }
