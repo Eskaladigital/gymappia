@@ -9,9 +9,7 @@
   --font-body: 'Inter', sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   font-family: var(--font-body);
@@ -25,7 +23,8 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(circle at 20% 80%, rgba(34,197,94,0.1) 0%, transparent 50%),
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(34,197,94,0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(34,197,94,0.08) 0%, transparent 40%),
     radial-gradient(circle at 50% 50%, rgba(34,197,94,0.04) 0%, transparent 60%);
   pointer-events: none;
@@ -49,7 +48,8 @@ html.dark body {
 }
 
 html.dark body::before {
-  background-image: radial-gradient(circle at 15% 85%, rgba(34,197,94,0.08) 0%, transparent 45%),
+  background-image:
+    radial-gradient(circle at 15% 85%, rgba(34,197,94,0.08) 0%, transparent 45%),
     radial-gradient(circle at 85% 15%, rgba(34,197,94,0.06) 0%, transparent 40%),
     radial-gradient(circle at 50% 50%, rgba(34,197,94,0.04) 0%, transparent 55%);
 }
@@ -59,94 +59,38 @@ html.dark body::after {
   opacity: 0.6;
 }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-display);
-}
+h1, h2, h3, h4 { font-family: var(--font-display); }
 
-/* Scrollbar personalizado */
+/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #e2e8f0; }
 ::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 3px; }
-
 html.dark ::-webkit-scrollbar-track { background: #0f172a; }
 
-/* Siluetas de fondo: aparecen, se mueven, desaparecen. En claro casi opacos (rellenan el fondo) */
-@keyframes floatRight {
-  0% { transform: translateX(-30%) translateY(5%); opacity: 0; }
-  8% { opacity: 1; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  92% { opacity: 0; }
-  100% { transform: translateX(130%) translateY(-5%); opacity: 0; }
-}
-
-@keyframes floatLeft {
-  0% { transform: translateX(130%) translateY(-3%); opacity: 0; }
-  8% { opacity: 1; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  92% { opacity: 0; }
-  100% { transform: translateX(-30%) translateY(8%); opacity: 0; }
-}
-
-@keyframes floatUp {
-  0% { transform: translateY(80vh) translateX(0) scale(0.9); opacity: 0; }
-  10% { opacity: 1; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  90% { opacity: 0; }
-  100% { transform: translateY(-15vh) translateX(10%) scale(0.9); opacity: 0; }
-}
-
-@keyframes floatDown {
-  0% { transform: translateY(-20vh) translateX(5%) scale(0.85); opacity: 0; }
-  8% { opacity: 1; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  92% { opacity: 0; }
-  100% { transform: translateY(90vh) translateX(-5%) scale(0.85); opacity: 0; }
-}
-
-
-.bg-silhouette { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
-.bg-silhouette span { position: absolute; }
-
-/* Animaciones */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulse-green {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
-  50%       { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
-}
-
-.animate-fadeInUp { animation: fadeInUp 0.4s ease both; }
-.animate-pulse-green { animation: pulse-green 2s infinite; }
-
-/* Frase motivadora estilo neon / Paco Gino - color chillón, letras neon */
+/* ─────────────────────────────────────────
+   FRASES MOTIVADORAS NEON
+───────────────────────────────────────── */
 .text-neon {
-  color: #00ff88;
+  color: #16a34a;
   font-weight: 700;
-  -webkit-text-stroke: 1px rgba(0,0,0,0.2);
+  letter-spacing: 0.01em;
   text-shadow:
-    0 0 5px #00ff88,
-    0 0 10px #00ff88,
-    0 0 20px #00ff88,
-    0 0 40px #00cc6a;
-}
-html.dark .text-neon {
-  color: #39ff94;
-  -webkit-text-stroke: 1px transparent;
-  text-shadow:
-    0 0 5px #39ff94,
-    0 0 15px #39ff94,
-    0 0 30px #00ff88,
-    0 0 50px #00cc6a;
+    0 0 8px rgba(34,197,94,0.5),
+    0 0 16px rgba(34,197,94,0.2);
 }
 
-/* Botón primario con gradiente y glow */
+html.dark .text-neon {
+  color: #4ade80;
+  text-shadow:
+    0 0 6px rgba(74,222,128,0.8),
+    0 0 14px rgba(34,197,94,0.5),
+    0 0 28px rgba(34,197,94,0.3);
+}
+
+/* ─────────────────────────────────────────
+   UI COMPONENTS
+───────────────────────────────────────── */
+
 .btn-primary {
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   box-shadow: 0 4px 14px -2px rgba(34,197,94,0.4);
@@ -156,33 +100,16 @@ html.dark .text-neon {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px -2px rgba(34,197,94,0.5);
 }
-.btn-primary:active {
-  transform: translateY(0);
-}
-html.dark .btn-primary {
-  box-shadow: 0 4px 14px -2px rgba(34,197,94,0.3);
-}
-html.dark .btn-primary:hover {
-  box-shadow: 0 6px 24px -2px rgba(34,197,94,0.4);
-}
+.btn-primary:active { transform: translateY(0); }
+html.dark .btn-primary { box-shadow: 0 4px 14px -2px rgba(34,197,94,0.3); }
+html.dark .btn-primary:hover { box-shadow: 0 6px 24px -2px rgba(34,197,94,0.4); }
 
-/* Card hover lift */
-.card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s;
-}
-.card-hover:hover {
-  transform: translateY(-2px);
-}
+.card-hover { transition: transform 0.2s ease, box-shadow 0.2s; }
+.card-hover:hover { transform: translateY(-2px); }
 
-/* Logo con sombra suave en modo claro */
-.logo-glow {
-  box-shadow: 0 8px 32px -8px rgba(34,197,94,0.3);
-}
-html.dark .logo-glow {
-  box-shadow: none;
-}
+.logo-glow { box-shadow: 0 8px 32px -8px rgba(34,197,94,0.3); }
+html.dark .logo-glow { box-shadow: none; }
 
-/* Glass card */
 .glass {
   background: rgba(255,255,255,0.75);
   backdrop-filter: blur(16px);
@@ -191,22 +118,14 @@ html.dark .logo-glow {
   box-shadow: 0 4px 24px -4px rgba(0,0,0,0.06);
   transition: transform 0.2s, box-shadow 0.2s;
 }
-
-.glass:hover {
-  box-shadow: 0 8px 32px -4px rgba(0,0,0,0.08);
-}
-
+.glass:hover { box-shadow: 0 8px 32px -4px rgba(0,0,0,0.08); }
 html.dark .glass {
   background: rgba(255,255,255,0.04);
   border-color: rgba(255,255,255,0.08);
   box-shadow: none;
 }
+html.dark .glass:hover { box-shadow: 0 0 0 1px rgba(255,255,255,0.06); }
 
-html.dark .glass:hover {
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
-}
-
-/* Input fields */
 .input-field {
   width: 100%;
   background: rgba(0,0,0,0.04);
@@ -218,46 +137,33 @@ html.dark .glass:hover {
   transition: border-color 0.2s;
   font-family: var(--font-body);
 }
-
 html.dark .input-field {
   background: rgba(255,255,255,0.05);
   border-color: rgba(255,255,255,0.1);
   color: #e2e8f0;
 }
-
 .input-field:focus {
   outline: none;
   border-color: #22c55e;
   background: rgba(34,197,94,0.05);
 }
+html.dark .input-field:focus { background: rgba(34,197,94,0.05); }
+.input-field::placeholder { color: #64748b; }
+html.dark .input-field::placeholder { color: #475569; }
 
-html.dark .input-field:focus {
-  background: rgba(34,197,94,0.05);
+.step-active  { background: #22c55e; color: #0a0f1e; font-weight: 700; }
+.step-done    { background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #22c55e; }
+.step-pending { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #64748b; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.input-field::placeholder {
-  color: #64748b;
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+  50%       { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
 }
 
-html.dark .input-field::placeholder {
-  color: #475569;
-}
-
-/* Step indicator */
-.step-active {
-  background: #22c55e;
-  color: #0a0f1e;
-  font-weight: 700;
-}
-
-.step-done {
-  background: rgba(34,197,94,0.2);
-  border: 1px solid #22c55e;
-  color: #22c55e;
-}
-
-.step-pending {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #64748b;
-}
+.animate-fadeInUp    { animation: fadeInUp 0.4s ease both; }
+.animate-pulse-green { animation: pulse-green 2s infinite; }

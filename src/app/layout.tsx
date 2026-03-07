@@ -3,6 +3,7 @@ import './globals.css'
 import { UnregisterSW } from '@/components/UnregisterSW'
 import ThemeToggleOrFixed from '@/components/ThemeToggleOrFixed'
 import MotivatingPhrase from '@/components/MotivatingPhrase'
+import BackgroundParticles from '@/components/BackgroundParticles'
 
 export const metadata: Metadata = {
   title: 'TrainCal - Entrenamiento Personal a Distancia',
@@ -47,17 +48,7 @@ export default function RootLayout({
       </head>
       <body className="relative">
         <UnregisterSW />
-        {/* Emojis: rellenan el fondo en claro (casi opacos), más sutiles en oscuro */}
-        <div className="bg-silhouette" aria-hidden>
-          <span className="text-4xl md:text-5xl opacity-90 dark:opacity-25" style={{ left: '5%', top: '15%', animation: 'floatRight 28s ease-in-out infinite' }}>🏃</span>
-          <span className="text-4xl md:text-5xl opacity-85 dark:opacity-22" style={{ right: '8%', top: '25%', animation: 'floatLeft 32s ease-in-out infinite 4s' }}>🏊</span>
-          <span className="text-4xl md:text-5xl opacity-90 dark:opacity-25" style={{ left: '12%', bottom: '30%', animation: 'floatUp 38s ease-in-out infinite 2s' }}>🧗</span>
-          <span className="text-4xl md:text-5xl opacity-85 dark:opacity-22" style={{ right: '15%', bottom: '20%', animation: 'floatDown 30s ease-in-out infinite 7s' }}>💪</span>
-          <span className="text-3xl md:text-4xl opacity-80 dark:opacity-18" style={{ left: '60%', top: '8%', animation: 'floatDown 34s ease-in-out infinite 1s' }}>🔥</span>
-          <span className="text-3xl md:text-4xl opacity-85 dark:opacity-22" style={{ right: '40%', top: '50%', animation: 'floatRight 26s ease-in-out infinite 5s' }}>⚡</span>
-          <span className="text-3xl md:text-4xl opacity-80 dark:opacity-18" style={{ left: '35%', bottom: '15%', animation: 'floatLeft 36s ease-in-out infinite 9s' }}>🎯</span>
-          <span className="text-3xl md:text-4xl opacity-85 dark:opacity-22" style={{ left: '75%', top: '70%', animation: 'floatUp 40s ease-in-out infinite 3s' }}>🏋️</span>
-        </div>
+        <BackgroundParticles />
         <MotivatingPhrase />
         <div className="relative z-10">{children}</div>
         <ThemeToggleOrFixed />
