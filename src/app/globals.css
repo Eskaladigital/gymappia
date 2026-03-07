@@ -125,6 +125,27 @@ html.dark ::-webkit-scrollbar-track { background: #0f172a; }
 .animate-fadeInUp { animation: fadeInUp 0.4s ease both; }
 .animate-pulse-green { animation: pulse-green 2s infinite; }
 
+/* Frase motivadora estilo neon / Paco Gino - color chillón, letras neon */
+.text-neon {
+  color: #00ff88;
+  font-weight: 700;
+  -webkit-text-stroke: 1px rgba(0,0,0,0.2);
+  text-shadow:
+    0 0 5px #00ff88,
+    0 0 10px #00ff88,
+    0 0 20px #00ff88,
+    0 0 40px #00cc6a;
+}
+html.dark .text-neon {
+  color: #39ff94;
+  -webkit-text-stroke: 1px transparent;
+  text-shadow:
+    0 0 5px #39ff94,
+    0 0 15px #39ff94,
+    0 0 30px #00ff88,
+    0 0 50px #00cc6a;
+}
+
 /* Botón primario con gradiente y glow */
 .btn-primary {
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
