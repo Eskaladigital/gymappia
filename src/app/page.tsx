@@ -23,16 +23,16 @@ export default function HomePage() {
             <h1 className="text-4xl sm:text-5xl font-black leading-none tracking-tight" style={{ fontFamily: 'Syne, sans-serif' }}>
               PAC<span className="text-brand-400">GYM</span>
             </h1>
-            <p className="text-slate-500 text-[10px] sm:text-xs tracking-widest uppercase mt-0.5">Entrenamiento personal</p>
+            <p className="text-slate-600 dark:text-slate-500 text-[10px] sm:text-xs tracking-widest uppercase mt-0.5">Entrenamiento personal</p>
           </div>
         </div>
 
         {/* Subtítulo */}
         <div>
-          <p className="text-base sm:text-xl text-slate-300 font-light leading-snug">
+          <p className="text-base sm:text-xl text-slate-700 dark:text-slate-300 font-light leading-snug">
             Tu plan de entrenamiento personalizado
           </p>
-          <p className="text-slate-500 text-xs sm:text-sm mt-1">
+          <p className="text-slate-600 dark:text-slate-500 text-xs sm:text-sm mt-1">
             Generado con IA · Supervisado por tu coach
           </p>
         </div>
@@ -50,8 +50,8 @@ export default function HomePage() {
               style={{ animationDelay: `${0.1 + i * 0.05}s` }}
             >
               <div className="text-xl sm:text-2xl mb-1">{f.icon}</div>
-              <p className="text-[11px] sm:text-xs font-semibold text-white">{f.label}</p>
-              <p className="text-[10px] text-slate-500 mt-0.5 hidden sm:block">{f.sub}</p>
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-white">{f.label}</p>
+              <p className="text-[10px] text-slate-600 dark:text-slate-500 mt-0.5 hidden sm:block">{f.sub}</p>
             </div>
           ))}
         </div>
@@ -66,7 +66,7 @@ export default function HomePage() {
           </Link>
           <Link
             href="/auth/login"
-            className="py-3.5 sm:py-4 sm:px-8 glass hover:bg-white/10 text-white font-medium rounded-xl transition-all text-sm border border-white/10 text-center"
+            className="py-3.5 sm:py-4 sm:px-8 glass hover:bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold rounded-xl transition-all text-sm border border-slate-200 dark:border-white/10 text-center"
           >
             Acceder a mi cuenta →
           </Link>

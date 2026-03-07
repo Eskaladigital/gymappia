@@ -281,9 +281,11 @@ export default function BackgroundParticles() {
 
         const el = getEl(p.id)
         if (el) {
+          const isDark = document.documentElement.classList.contains('dark')
+          const displayOpacity = isDark ? p.opacity : Math.min(p.opacity * 2.8, 0.85)
           el.style.left = `${p.x}vw`
           el.style.top = `${p.y}vh`
-          el.style.opacity = String(Math.round(p.opacity * 1000) / 1000)
+          el.style.opacity = String(Math.round(displayOpacity * 1000) / 1000)
           el.style.transform = getTransform(p)
         }
       }

@@ -6,10 +6,15 @@ import { Sun, Moon } from 'lucide-react'
 const STORAGE_KEY = 'pacgym-theme'
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'dark'
-    return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-  })
+  const [theme, setThemeState] = useState<'dark' | 'light'>('dark')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setThemeState(
+      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+    )
+  }, [])
 
   const setTheme = (next: 'dark' | 'light') => {
     setThemeState(next)
@@ -19,11 +24,11 @@ export function useTheme() {
 
   const toggle = () => setTheme(theme === 'dark' ? 'light' : 'dark')
 
-  return { theme, setTheme, toggle }
+  return { theme, setTheme, toggle, mounted }
 }
 
 export default function ThemeToggle() {
-  const { theme, toggle } = useTheme()
+  const { theme, toggle, mounted } = useTheme()
 
   return (
     <button
@@ -32,7 +37,9 @@ export default function ThemeToggle() {
       title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
       aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
     >
-      {theme === 'dark' ? (
+      {!mounted ? (
+        <span className="w-[18px] h-[18px]" aria-hidden />
+      ) : theme === 'dark' ? (
         <Sun size={18} className="text-amber-400" />
       ) : (
         <Moon size={18} className="text-slate-600" />
