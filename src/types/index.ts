@@ -156,6 +156,7 @@ export interface PlanConfig {
   modules: TrainingModule[]
   session: SessionParams
   pack_id?: string          // si se aplica un pack preconfigurado
+  pack_nombre?: string      // nombre del pack para persistir la selección
   notas_coach?: string      // instrucciones libres del entrenador
 }
 

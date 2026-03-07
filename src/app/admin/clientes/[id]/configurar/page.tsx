@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -8,6 +8,8 @@ import {
   type ClientProfile, type TrainingModule, type SessionParams,
   type AISuggestion, type TrainingPack, type PlanConfig
 } from '@/types'
+import GeneratePlanModal from '@/components/GeneratePlanModal'
+import ConfirmGenerateModal from '@/components/ConfirmGenerateModal'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const initModules = (): TrainingModule[] =>
@@ -41,18 +43,21 @@ export default function ConfigurarPage() {
   const [selectedPackNombre, setSelectedPackNombre] = useState<string | null>(null)
   const [loadingAI, setLoadingAI] = useState(false)
   const [generating, setGenerating] = useState(false)
+  const [generateStatus, setGenerateStatus] = useState<'generating' | 'success' | 'error'>('generating')
   const [activeSection, setActiveSection] = useState<'modulos' | 'sesion' | 'packs'>('modulos')
   const [newPackNombre, setNewPackNombre] = useState('')
   const [savingPack, setSavingPack] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   useEffect(() => {
     loadData()
   }, [])
 
   const loadData = async () => {
-    const [clientRes, packsRes] = await Promise.all([
+    const [clientRes, packsRes, planRes] = await Promise.all([
       supabase.from('clients').select('*').eq('id', id).single(),
       fetch('/api/packs').then(r => r.json()),
+      supabase.from('training_plans').select('plan_config').eq('client_id', id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
     ])
     if (clientRes.data) {
       setClient(clientRes.data)
@@ -68,6 +73,27 @@ export default function ConfigurarPage() {
       ...(packsRes.custom || []),
     ]
     setPacks(allPacks)
+
+    // Restaurar config guardada (pack, módulos, sesión) del último plan generado
+    const cfg = planRes.data?.plan_config as PlanConfig | null
+    if (cfg?.modules?.length) {
+      setModules(prev =>
+        prev.map(m => {
+          const c = cfg.modules.find((cm: { id: string }) => cm.id === m.id)
+          return c ? { ...m, value: c.value } : m
+        })
+      )
+    }
+    if (cfg?.session) {
+      setSession(s => ({
+        ...s,
+        ...cfg.session,
+        dias_semana: clientRes.data?.sesiones_semana ?? cfg.session.dias_semana ?? s.dias_semana,
+        duracion_media_min: clientRes.data?.minutos_sesion ?? cfg.session.duracion_media_min ?? s.duracion_media_min,
+      }))
+    }
+    if (cfg?.pack_nombre) setSelectedPackNombre(cfg.pack_nombre)
+    if (cfg?.notas_coach) setNotasCoach(cfg.notas_coach)
   }
 
   // ── Pedir sugerencia a la IA ────────────────────────────────────────────
@@ -141,12 +167,14 @@ export default function ConfigurarPage() {
   }
 
   // ── Generar plan con la configuración actual ────────────────────────────
-  const generatePlan = async () => {
+  const generatePlan = async (configOverride?: PlanConfig) => {
     if (!client) return
     setGenerating(true)
-    const config: PlanConfig = {
+    setGenerateStatus('generating')
+    const config: PlanConfig = configOverride ?? {
       modules,
       session,
+      pack_nombre: selectedPackNombre || undefined,
       notas_coach: notasCoach || undefined,
     }
     try {
@@ -159,11 +187,22 @@ export default function ConfigurarPage() {
         const data = await res.json().catch(() => ({}))
         throw new Error(data.error || `Error ${res.status}`)
       }
-      router.push(`/admin/clientes/${id}?tab=plan`)
+      setGenerateStatus('success')
     } catch (e: any) {
+      setGenerating(false)
       alert(e?.message || 'Error al generar el plan')
     }
+  }
+
+  const handleConfirmGenerate = (finalConfig: PlanConfig) => {
+    setSession(prev => ({ ...prev, ...finalConfig.session }))
+    generatePlan(finalConfig)
+  }
+
+  const closeGenerateModal = () => {
     setGenerating(false)
+    setGenerateStatus('generating')
+    router.push(`/admin/clientes/${id}?tab=plan`)
   }
 
   // ── Update helpers ──────────────────────────────────────────────────────
@@ -187,6 +226,23 @@ export default function ConfigurarPage() {
 
   return (
     <div className="min-h-screen px-4 py-6 max-w-4xl mx-auto">
+      <GeneratePlanModal
+        open={generating}
+        status={generateStatus}
+        onClose={closeGenerateModal}
+      />
+      <ConfirmGenerateModal
+        open={showConfirmModal}
+        client={client}
+        config={{
+          modules,
+          session,
+          pack_nombre: selectedPackNombre || undefined,
+          notas_coach: notasCoach || undefined,
+        }}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmGenerate}
+      />
 
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -202,7 +258,7 @@ export default function ConfigurarPage() {
         </div>
 
         {/* Generate button */}
-        <button onClick={generatePlan} disabled={generating}
+        <button onClick={() => setShowConfirmModal(true)} disabled={generating}
           className="px-5 py-3 bg-brand-500 hover:bg-brand-400 disabled:opacity-50 text-black font-black rounded-xl text-sm transition-all flex items-center gap-2">
           {generating ? (
             <><span className="animate-spin">⚙️</span> Generando plan...</>
@@ -489,7 +545,7 @@ export default function ConfigurarPage() {
       {/* Bottom sticky generate */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#0a0f1e] to-transparent pointer-events-none">
         <div className="max-w-4xl mx-auto pointer-events-auto">
-          <button onClick={generatePlan} disabled={generating}
+          <button onClick={() => setShowConfirmModal(true)} disabled={generating}
             className="w-full py-4 bg-brand-500 hover:bg-brand-400 disabled:opacity-50 text-black font-black rounded-2xl text-base transition-all flex items-center justify-center gap-2">
             {generating ? (
               <><span className="animate-spin">⚙️</span> Generando plan personalizado...</>

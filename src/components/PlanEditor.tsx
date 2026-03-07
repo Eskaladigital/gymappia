@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import type { TrainingPlan, WorkoutDay, Exercise } from '@/types'
+import { DIA_ABBREV, DIA_LABEL } from '@/lib/utils'
 
 interface PlanEditorProps {
   plan: TrainingPlan
@@ -17,7 +18,7 @@ function deepClone<T>(obj: T): T {
 export default function PlanEditor({ plan, onSave }: PlanEditorProps) {
   const [semanas, setSemanas] = useState(() => deepClone(plan.semanas))
   const [activeWeek, setActiveWeek] = useState(1)
-  const [expandedDay, setExpandedDay] = useState<string | null>(null)
+  const [expandedDay, setExpandedDay] = useState<string | null>('0-0')  // Primer día expandido por defecto
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -272,11 +273,11 @@ function DayEditor({
           onClick={onToggle}
           className="flex-1 flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
         >
-          <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold uppercase flex-shrink-0">
-            {day.dia.slice(0, 2)}
+          <div className="min-w-[2.5rem] px-1.5 py-1 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
+            {DIA_ABBREV[day.dia] ?? day.dia.slice(0,3)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold capitalize text-sm">{day.dia}</p>
+            <p className="font-semibold text-sm">{DIA_LABEL[day.dia] ?? day.dia}</p>
             <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min}min · {day.ejercicios.length} ejercicios</p>
           </div>
           <span className="text-slate-600 text-sm">{expanded ? '▲' : '▼'}</span>
@@ -403,76 +404,106 @@ function ExerciseRow({ exercise, exIdx, total, onChange, onRemove, onMove }: Exe
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="bg-white/[0.03] border border-white/8 rounded-xl overflow-hidden">
+    <div className="glass border border-white/10 rounded-xl overflow-hidden">
       {/* Fila principal */}
-      <div className="flex items-center gap-2 px-3 py-2.5">
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3">
         {/* Orden */}
         <div className="flex flex-col gap-0.5 flex-shrink-0">
           <button
             onClick={() => onMove('up')}
             disabled={exIdx === 0}
-            className="w-4 h-4 flex items-center justify-center text-slate-600 hover:text-slate-300 disabled:opacity-20 text-xs leading-none"
+            className="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-white disabled:opacity-20 text-xs leading-none rounded hover:bg-white/10"
           >▲</button>
           <button
             onClick={() => onMove('down')}
             disabled={exIdx === total - 1}
-            className="w-4 h-4 flex items-center justify-center text-slate-600 hover:text-slate-300 disabled:opacity-20 text-xs leading-none"
+            className="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-white disabled:opacity-20 text-xs leading-none rounded hover:bg-white/10"
           >▼</button>
         </div>
 
-        {/* Número */}
-        <span className="text-xs text-slate-600 font-mono w-4 flex-shrink-0">{exIdx + 1}.</span>
+        <span className="text-xs text-slate-500 font-mono w-5 flex-shrink-0">{exIdx + 1}.</span>
 
-        {/* Nombre */}
+        {/* Nombre — campo principal editable */}
         <input
           type="text"
           value={exercise.nombre}
           onChange={e => onChange('nombre', e.target.value)}
-          className="flex-1 bg-transparent text-sm text-white placeholder-slate-600 outline-none min-w-0 font-medium"
+          className="input-field flex-1 min-w-[140px] text-sm font-medium"
           placeholder="Nombre del ejercicio"
         />
 
-        {/* Series × Reps */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        {/* Series */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <label className="text-[10px] text-slate-500 uppercase">Series</label>
           <input
             type="number"
             min={1} max={20}
             value={exercise.series}
             onChange={e => onChange('series', +e.target.value)}
-            className="w-8 bg-white/5 border border-white/10 rounded text-center text-xs text-brand-400 font-bold outline-none focus:border-brand-500/50 py-1"
-            title="Series"
-          />
-          <span className="text-slate-600 text-xs">×</span>
-          <input
-            type="text"
-            value={exercise.repeticiones}
-            onChange={e => onChange('repeticiones', e.target.value)}
-            className="w-10 bg-white/5 border border-white/10 rounded text-center text-xs text-brand-400 font-bold outline-none focus:border-brand-500/50 py-1"
-            placeholder="10"
-            title="Repeticiones"
+            className="input-field w-12 text-center text-sm font-bold py-1.5"
           />
         </div>
 
+        {/* Reps o Segundos — selector + input */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <select
+            value={exercise.repeticiones?.toLowerCase().includes('seg') ? 'seg' : 'reps'}
+            onChange={e => {
+              const isSeg = e.target.value === 'seg'
+              if (isSeg) {
+                const num = parseInt((exercise.repeticiones || '').replace(/\D/g, ''), 10) || 30
+                onChange('repeticiones', `${num} seg`)
+              } else {
+                const val = (exercise.repeticiones || '').replace(/\s*seg/i, '').trim()
+                onChange('repeticiones', val || '10')
+              }
+            }}
+            className="input-field w-14 text-center text-xs font-bold py-1.5"
+          >
+            <option value="reps">Reps</option>
+            <option value="seg">Seg</option>
+          </select>
+          {exercise.repeticiones?.toLowerCase().includes('seg') ? (
+            <input
+              type="number"
+              min={5} max={300} step={5}
+              value={parseInt((exercise.repeticiones || '30').replace(/\D/g, ''), 10) || 30}
+              onChange={e => onChange('repeticiones', `${e.target.value || 30} seg`)}
+              className="input-field w-12 text-center text-sm font-bold py-1.5"
+            />
+          ) : (
+            <input
+              type="text"
+              value={(exercise.repeticiones || '').replace(/\s*seg/i, '').trim()}
+              onChange={e => onChange('repeticiones', e.target.value)}
+              className="input-field w-14 text-center text-sm font-bold py-1.5"
+              placeholder="10"
+              title='Ej: 10, 8-12'
+            />
+          )}
+        </div>
+
         {/* Descanso */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <label className="text-[10px] text-slate-500 uppercase">Desc.</label>
           <input
             type="number"
             min={10} max={300} step={5}
             value={exercise.descanso_seg}
             onChange={e => onChange('descanso_seg', +e.target.value)}
-            className="w-10 bg-white/5 border border-white/10 rounded text-center text-xs text-slate-400 outline-none focus:border-brand-500/50 py-1"
-            title="Descanso en segundos"
+            className="input-field w-12 text-center text-sm py-1.5"
+            title="Segundos"
           />
-          <span className="text-slate-600 text-xs">s</span>
+          <span className="text-slate-500 text-xs">s</span>
         </div>
 
-        {/* Notas toggle */}
+        {/* Notas */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center text-xs transition-all ${
-            expanded || exercise.notas ? 'text-amber-400' : 'text-slate-600 hover:text-slate-400'
+          className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all ${
+            expanded || exercise.notas ? 'bg-amber-500/20 text-amber-400' : 'glass text-slate-500 hover:text-amber-400 hover:bg-amber-500/10'
           }`}
-          title="Notas"
+          title="Notas del ejercicio"
         >
           💬
         </button>
@@ -480,7 +511,7 @@ function ExerciseRow({ exercise, exIdx, total, onChange, onRemove, onMove }: Exe
         {/* Eliminar */}
         <button
           onClick={onRemove}
-          className="flex-shrink-0 w-6 h-6 rounded flex items-center justify-center text-xs text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all"
+          className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
           title="Eliminar ejercicio"
         >
           ✕
@@ -489,13 +520,13 @@ function ExerciseRow({ exercise, exIdx, total, onChange, onRemove, onMove }: Exe
 
       {/* Nota expandible */}
       {expanded && (
-        <div className="px-3 pb-2.5 border-t border-white/5 pt-2">
+        <div className="px-4 pb-3 pt-2 border-t border-white/5">
           <input
             type="text"
             value={exercise.notas || ''}
             onChange={e => onChange('notas', e.target.value)}
             placeholder="Notas para el cliente (ej: Mantén la espalda recta, ve lento en la bajada...)"
-            className="w-full bg-transparent text-xs text-slate-400 placeholder-slate-600 outline-none"
+            className="input-field w-full text-sm"
             autoFocus
           />
         </div>

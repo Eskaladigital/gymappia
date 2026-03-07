@@ -3,10 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { GOAL_LABELS, LEVEL_LABELS, LOCATION_LABELS } from '@/lib/utils'
-import type { ClientProfile, TrainingPlan, WorkoutDay, SessionLog } from '@/types'
+import { GOAL_LABELS, LEVEL_LABELS, LOCATION_LABELS, DIA_ABBREV, DIA_LABEL } from '@/lib/utils'
+import type { ClientProfile, TrainingPlan, WorkoutDay, SessionLog, PlanConfig } from '@/types'
+import { BASE_MODULES } from '@/types'
+import ConfirmGenerateModal from '@/components/ConfirmGenerateModal'
 import PlanEditor from '@/components/PlanEditor'
 import MonthlyCalendar from '@/components/MonthlyCalendar'
+import GeneratePlanModal from '@/components/GeneratePlanModal'
 import { Suspense } from 'react'
 
 function AdminClienteContent() {
@@ -18,6 +21,7 @@ function AdminClienteContent() {
   const [plan, setPlan] = useState<TrainingPlan | null>(null)
   const [logs, setLogs] = useState<SessionLog[]>([])
   const [generating, setGenerating] = useState(false)
+  const [generateStatus, setGenerateStatus] = useState<'generating' | 'success' | 'error'>('generating')
   const [activeWeek, setActiveWeek] = useState(1)
   const [activeDay, setActiveDay] = useState<WorkoutDay | null>(null)
   const [loading, setLoading] = useState(true)
@@ -28,6 +32,7 @@ function AdminClienteContent() {
   const [progressPhotos, setProgressPhotos] = useState<{ id: string; semana: number; foto_url: string; notas?: string; peso_kg?: number }[]>([])
   const [notaSesion, setNotaSesion] = useState('')
   const [enviandoNota, setEnviandoNota] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   useEffect(() => { loadData() }, [])
 
@@ -53,24 +58,53 @@ function AdminClienteContent() {
     setLoading(false)
   }
 
-  const generatePlan = async () => {
+  const generatePlan = async (config?: PlanConfig) => {
     if (!client) return
     setGenerating(true)
+    setGenerateStatus('generating')
     try {
       const res = await fetch('/api/generate-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile: client, clientId: id }),
+        body: JSON.stringify(
+          config
+            ? { profile: client, config, clientId: id }
+            : { profile: client, clientId: id }
+        ),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error(data.error || `Error ${res.status}`)
       }
       await loadData()
+      setGenerateStatus('success')
     } catch (e: any) {
+      setGenerating(false)
       alert(e?.message || 'Error al generar el plan')
     }
+  }
+
+  const getDefaultConfig = (): PlanConfig => ({
+    modules: BASE_MODULES.map(m => ({ ...m, value: 50 })),
+    session: {
+      duracion_media_min: client?.minutos_sesion ?? 45,
+      descanso_entre_series_seg: 75,
+      rpe_objetivo: 6,
+      semanas_duracion: 4,
+      dias_semana: client?.sesiones_semana ?? 3,
+      progresion: 'lineal',
+      enfoque_tecnico: 70,
+      variedad: 50,
+    },
+  })
+
+  const handleConfirmGenerate = (finalConfig: PlanConfig) => {
+    generatePlan(finalConfig)
+  }
+
+  const closeGenerateModal = () => {
     setGenerating(false)
+    setGenerateStatus('generating')
   }
 
   const activateClient = async () => {
@@ -102,6 +136,18 @@ function AdminClienteContent() {
 
   return (
     <div className="min-h-screen px-4 py-8 max-w-3xl mx-auto">
+      <GeneratePlanModal
+        open={generating}
+        status={generateStatus}
+        onClose={closeGenerateModal}
+      />
+      <ConfirmGenerateModal
+        open={showConfirmModal}
+        client={client}
+        config={client ? getDefaultConfig() : null}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmGenerate}
+      />
       {/* Header */}
       <button onClick={() => router.push('/admin')} className="text-slate-500 hover:text-white text-sm mb-5 flex items-center gap-2">
         ← Admin
@@ -140,9 +186,9 @@ function AdminClienteContent() {
                 className="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-xs transition-all">
                 🎛️ Configurar y generar plan
               </button>
-              <button onClick={generatePlan} disabled={generating}
+              <button onClick={() => setShowConfirmModal(true)} disabled={generating}
                 className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl text-xs transition-all disabled:opacity-50">
-                {generating ? '🤖 Generando...' : '⚡ Generar rápido (sin config)'}
+                {generating ? '🤖 Generando...' : '⚡ Generar rápido'}
               </button>
             </div>
           )}
@@ -218,7 +264,7 @@ function AdminClienteContent() {
               <div className="text-4xl mb-4">📋</div>
               <h3 className="font-bold mb-2">Sin plan generado</h3>
               <p className="text-slate-500 text-sm mb-5">Genera el plan con IA para este cliente</p>
-              <button onClick={generatePlan} disabled={generating}
+              <button onClick={() => setShowConfirmModal(true)} disabled={generating}
                 className="px-6 py-3 bg-brand-500 hover:bg-brand-400 text-black font-bold rounded-xl text-sm disabled:opacity-50 transition-all">
                 {generating ? '🤖 Generando plan con IA...' : '🤖 Generar plan ahora'}
               </button>
@@ -284,11 +330,11 @@ function AdminClienteContent() {
                           className="w-full p-4 text-left hover:bg-white/5 transition-all">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <span className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold uppercase">
-                                {day.dia.slice(0,2)}
+                              <span className="min-w-[2.5rem] px-1.5 py-1 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold">
+                                {DIA_ABBREV[day.dia] ?? day.dia.slice(0,3)}
                               </span>
                               <div>
-                                <p className="font-semibold capitalize">{day.dia}</p>
+                                <p className="font-semibold">{DIA_LABEL[day.dia] ?? day.dia}</p>
                                 <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
                               </div>
                             </div>

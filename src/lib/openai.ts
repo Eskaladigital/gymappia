@@ -103,6 +103,7 @@ ${rotacionSugerida}
 - Cada sesión: mínimo 4 ejercicios, máximo 7. Ajustar al tiempo de ${session.duracion_media_min} min
 
 ━━━ FORMATO JSON REQUERIDO ━━━
+CRÍTICO: Genera EXACTAMENTE ${session.semanas_duracion} semanas (ni más ni menos) en el array "semanas".
 Responde SOLO con JSON válido, sin texto adicional:
 {
   "titulo": "string descriptivo del plan completo",
@@ -141,13 +142,27 @@ Responde SOLO con JSON válido, sin texto adicional:
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
     temperature: 0.85,  // Más alto para más creatividad y variedad
-    max_tokens: 8000,   // Más tokens para que no recorte ejercicios
+    max_tokens: 16000,  // Suficiente para 4+ semanas con todos los ejercicios
   })
 
   const content = response.choices[0].message.content
   if (!content) throw new Error('OpenAI no devolvió contenido')
 
   const planData = JSON.parse(content)
+
+  // Validar y ajustar semanas: exactamente las configuradas (nunca más)
+  const semanasPedidas = Math.max(1, Math.min(12, session.semanas_duracion ?? 4))
+  const semanasGeneradas = planData.semanas?.length ?? 0
+  if (semanasGeneradas < semanasPedidas) {
+    throw new Error(
+      `La IA solo generó ${semanasGeneradas} semana(s) de ${semanasPedidas} requeridas. ` +
+      'Por favor, intenta generar de nuevo.'
+    )
+  }
+  // Si la IA generó más de lo pedido, usar SOLO las primeras N semanas (slice(0,undefined)=todo el array!)
+  const semanasFinales = (planData.semanas || []).slice(0, semanasPedidas)
+  planData.semanas = semanasFinales
+  planData.duracion_semanas = semanasPedidas
 
   // Normalizar días (quitar tildes: miércoles → miercoles) para consistencia
   const DIAS_CANONICOS: Record<string, string> = {

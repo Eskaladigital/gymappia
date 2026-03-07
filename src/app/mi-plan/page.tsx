@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { TrainingPlan, ClientProfile, UserStats, WorkoutDay, SessionLog } from '@/types'
 import MonthlyCalendar from '@/components/MonthlyCalendar'
+import { DIA_ABBREV, DIA_LABEL } from '@/lib/utils'
 
 const DIAS_ORDER = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 
@@ -431,13 +432,13 @@ function MiPlanContent() {
                       className={`w-full glass rounded-2xl p-4 text-left hover:bg-white/[0.06] transition-all ${done ? 'border border-brand-500/30' : ''}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
+                          <div className={`min-w-[2.5rem] px-1.5 py-1 rounded-xl flex items-center justify-center font-bold text-sm ${
                             done ? 'bg-brand-500 text-black' : 'bg-white/5 text-slate-400'
                           }`}>
-                            {done ? '✓' : day.dia.slice(0,2).toUpperCase()}
+                            {done ? '✓' : (DIA_ABBREV[day.dia] ?? day.dia.slice(0,3))}
                           </div>
                           <div>
-                            <p className={`font-semibold capitalize ${done ? 'text-brand-400' : 'text-white'}`}>{day.dia}</p>
+                            <p className={`font-semibold ${done ? 'text-brand-400' : 'text-white'}`}>{DIA_LABEL[day.dia] ?? day.dia}</p>
                             <p className="text-xs text-slate-500">{day.tipo} · {day.duracion_min} min · {day.ejercicios.length} ejercicios</p>
                           </div>
                         </div>
@@ -548,7 +549,7 @@ function MiPlanContent() {
           <div className="w-full max-w-lg glass rounded-3xl p-5 animate-fadeInUp max-h-[85vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="font-black text-lg capitalize">{selectedDay.dia}</h3>
+                <h3 className="font-black text-lg">{DIA_LABEL[selectedDay.dia] ?? selectedDay.dia}</h3>
                 <p className="text-slate-400 text-sm">{selectedDay.tipo} · {selectedDay.duracion_min} min</p>
               </div>
               <button onClick={() => { setShowModal(false); setSustituto(null) }} className="text-slate-500 hover:text-white text-xl">✕</button>

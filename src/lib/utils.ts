@@ -34,3 +34,15 @@ export const LOCATION_LABELS: Record<string, string> = {
   exterior: '🌿 Exterior',
   mixto: '🔄 Mixto',
 }
+
+/** Abreviaturas de días para badges (miercoles → Mié para que se vea bien) */
+export const DIA_ABBREV: Record<string, string> = {
+  lunes: 'Lun', martes: 'Mar', miercoles: 'Mié', jueves: 'Jue',
+  viernes: 'Vie', sabado: 'Sáb', domingo: 'Dom',
+}
+
+/** Nombre completo del día con tilde correcta (miercoles → Miércoles) */
+export const DIA_LABEL: Record<string, string> = {
+  lunes: 'Lunes', martes: 'Martes', miercoles: 'Miércoles', jueves: 'Jueves',
+  viernes: 'Viernes', sabado: 'Sábado', domingo: 'Domingo',
+}

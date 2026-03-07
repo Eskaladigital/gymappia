@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { GOAL_LABELS, LEVEL_LABELS, LOCATION_LABELS } from '@/lib/utils'
+import { GOAL_LABELS, LEVEL_LABELS, LOCATION_LABELS, DIA_ABBREV, DIA_LABEL } from '@/lib/utils'
 import type { ClientProfile, TrainingPlan, WorkoutDay } from '@/types'
 
 export default function ClientePage() {
@@ -130,11 +130,11 @@ export default function ClientePage() {
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold uppercase">
-                      {dia.dia.slice(0, 2)}
+                    <span className="min-w-[2.5rem] px-1.5 py-1 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold">
+                      {DIA_ABBREV[dia.dia] ?? dia.dia.slice(0,3)}
                     </span>
                     <div>
-                      <p className="font-semibold capitalize">{dia.dia}</p>
+                      <p className="font-semibold">{DIA_LABEL[dia.dia] ?? dia.dia}</p>
                       <p className="text-xs text-slate-500">{dia.tipo}</p>
                     </div>
                   </div>

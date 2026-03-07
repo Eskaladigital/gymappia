@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { TrainingPlan, WorkoutDay, SessionLog } from '@/types'
+import { DIA_LABEL } from '@/lib/utils'
 
 interface MonthlyCalendarProps {
   plan: TrainingPlan
@@ -314,8 +315,8 @@ export default function MonthlyCalendar({
                     <p className={`text-xs font-semibold capitalize truncate ${c.done ? 'text-brand-300' : 'text-white'}`}>
                       {c.workoutDay!.tipo}
                     </p>
-                    <p className="text-[10px] text-slate-500 capitalize truncate">
-                      {c.workoutDay!.dia} · {c.workoutDay!.duracion_min}min · {c.workoutDay!.ejercicios.length} ej · Sem {c.semana}
+                    <p className="text-[10px] text-slate-500 truncate">
+                      {DIA_LABEL[c.workoutDay!.dia] ?? c.workoutDay!.dia} · {c.workoutDay!.duracion_min}min · {c.workoutDay!.ejercicios.length} ej · Sem {c.semana}
                     </p>
                   </div>
 
