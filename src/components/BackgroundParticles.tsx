@@ -8,57 +8,29 @@ interface IconDef {
   emoji: string
   behavior: Behavior
   baseSize: number
-  // Dirección nativa del emoji: 1 = mira a la derecha, -1 = mira a la izquierda
-  // Si el icono tiene que moverse en dirección contraria a su nativeDir → scaleX(-1)
   nativeDir: 1 | -1
 }
 
 const ICON_DEFS: IconDef[] = [
-  // ── Corredores / ciclistas / nadadores → run
-  // 🏃 mira a la derecha por defecto
   { emoji: '🏃', behavior: 'run',  baseSize: 2.2, nativeDir:  1 },
-  // 🚴 mira a la izquierda
   { emoji: '🚴', behavior: 'run',  baseSize: 2.2, nativeDir: -1 },
-  // 🏊 mira a la izquierda
   { emoji: '🏊', behavior: 'run',  baseSize: 2.0, nativeDir: -1 },
-  // 🚶 mira a la derecha
   { emoji: '🚶', behavior: 'run',  baseSize: 2.0, nativeDir:  1 },
-  // ⛷️ mira a la derecha
   { emoji: '⛷️', behavior: 'run', baseSize: 2.2, nativeDir:  1 },
-  // 🏂 mira a la derecha
   { emoji: '🏂', behavior: 'run',  baseSize: 2.0, nativeDir:  1 },
-  // 🛹 mira a la derecha
   { emoji: '🛹', behavior: 'run',  baseSize: 1.8, nativeDir:  1 },
-  // 🏄 mira a la derecha
   { emoji: '🏄', behavior: 'run',  baseSize: 2.2, nativeDir:  1 },
-  // 🚣 mira a la izquierda
   { emoji: '🚣', behavior: 'run',  baseSize: 2.0, nativeDir: -1 },
-
-  // ── Saltos → jump
-  // 🏇 mira a la izquierda
   { emoji: '🏇', behavior: 'jump', baseSize: 2.4, nativeDir: -1 },
-  // 🤸 simétrico, usamos 1
   { emoji: '🤸', behavior: 'jump', baseSize: 2.2, nativeDir:  1 },
-  // 🧗 mira a la derecha (sube)
   { emoji: '🧗', behavior: 'jump', baseSize: 2.0, nativeDir:  1 },
-  // 🤾 mira a la derecha
   { emoji: '🤾', behavior: 'jump', baseSize: 2.2, nativeDir:  1 },
-  // 🪂 simétrico
   { emoji: '🪂', behavior: 'jump', baseSize: 2.2, nativeDir:  1 },
-
-  // ── Golpes / fuerza → punch
-  // 🥊 mira a la izquierda (guante apuntando izquierda)
   { emoji: '🥊', behavior: 'punch', baseSize: 2.2, nativeDir: -1 },
-  // 🥋 figura mirando a la derecha
   { emoji: '🥋', behavior: 'punch', baseSize: 2.2, nativeDir:  1 },
-  // 🏋️ simétrico
   { emoji: '🏋️', behavior: 'punch', baseSize: 2.4, nativeDir:  1 },
-  // 🤺 mira a la derecha
   { emoji: '🤺', behavior: 'punch', baseSize: 2.2, nativeDir:  1 },
-  // 💪 simétrico
   { emoji: '💪', behavior: 'punch', baseSize: 2.0, nativeDir:  1 },
-
-  // ── Pelotas → spin (giran, no tienen dirección)
   { emoji: '⚽', behavior: 'spin', baseSize: 1.8, nativeDir: 1 },
   { emoji: '🏀', behavior: 'spin', baseSize: 1.8, nativeDir: 1 },
   { emoji: '🎾', behavior: 'spin', baseSize: 1.6, nativeDir: 1 },
@@ -69,9 +41,6 @@ const ICON_DEFS: IconDef[] = [
   { emoji: '🥎', behavior: 'spin', baseSize: 1.6, nativeDir: 1 },
   { emoji: '🎱', behavior: 'spin', baseSize: 1.6, nativeDir: 1 },
   { emoji: '🥏', behavior: 'spin', baseSize: 1.6, nativeDir: 1 },
-
-  // ── Raquetas / palos → throw (wobble)
-  // Estos objetos no tienen "frente", el wobble es angular, sin scaleX
   { emoji: '🏓', behavior: 'throw', baseSize: 1.8, nativeDir: 1 },
   { emoji: '🏸', behavior: 'throw', baseSize: 1.8, nativeDir: 1 },
   { emoji: '🏒', behavior: 'throw', baseSize: 1.8, nativeDir: 1 },
@@ -79,12 +48,9 @@ const ICON_DEFS: IconDef[] = [
   { emoji: '🏏', behavior: 'throw', baseSize: 1.8, nativeDir: 1 },
   { emoji: '🪃', behavior: 'throw', baseSize: 1.8, nativeDir: 1 },
   { emoji: '🏹', behavior: 'throw', baseSize: 1.8, nativeDir: 1 },
-
-  // ── Deportes tranquilos → breathe
   { emoji: '🧘', behavior: 'breathe', baseSize: 2.2, nativeDir:  1 },
   { emoji: '🤿', behavior: 'breathe', baseSize: 2.0, nativeDir:  1 },
   { emoji: '🎣', behavior: 'breathe', baseSize: 2.0, nativeDir:  1 },
-  // 🏌️ mira a la izquierda
   { emoji: '🏌️', behavior: 'breathe', baseSize: 2.2, nativeDir: -1 },
 ]
 
@@ -104,7 +70,6 @@ interface Particle {
   opacity: number
   targetOpacity: number
   animTime: number
-  // dirección de movimiento: 1=derecha, -1=izquierda
   dir: number
 }
 
@@ -130,10 +95,8 @@ function spawnParticle(): Particle {
     else if (def.behavior === 'breathe') speed = 1.5 + Math.random() * 2
 
     vx = dir * speed
-    // vy suave para que no vayan perfectamente rectos
     vy = (Math.random() - 0.5) * (speed * 0.2)
   } else {
-    // spin → desde cualquier borde
     const edge = Math.floor(Math.random() * 4)
     const speed = 7 + Math.random() * 8
     if (edge === 0) { x = Math.random() * 100; y = -15; vx = (Math.random() - 0.5) * speed; vy = speed * 0.8 }
@@ -155,44 +118,32 @@ function spawnParticle(): Particle {
 function getTransform(p: Particle): string {
   const t = p.animTime
   const { nativeDir } = p.def
-
-  // scaleX que hay que aplicar para que mire hacia donde va:
   const faceScale = p.dir === nativeDir ? 1 : -1
 
   switch (p.def.behavior) {
     case 'run': {
-      // Salto rápido de carrera, inclinación hacia adelante
       const speedMult = Math.abs(p.vx) * 0.8
       const bob = Math.abs(Math.sin(t * speedMult)) * -6
-      const lean = 12 * p.dir * faceScale // Inclinación hacia adelante
+      const lean = 12 * p.dir * faceScale
       const rock = Math.sin(t * speedMult) * 8
       return `scaleX(${faceScale}) translateY(${bob}px) rotate(${lean + rock}deg)`
     }
     case 'jump': {
-      // Trayectoria de saltos continuos (parkour)
       const speedMult = Math.abs(p.vx) * 0.5
       const cycle = (t * speedMult) % Math.PI
-      const jumpY = -Math.sin(cycle) * 45 // Arco del salto
-      
-      // Squash & stretch al tocar el suelo
+      const jumpY = -Math.sin(cycle) * 45
       const isGround = cycle < 0.2 || cycle > Math.PI - 0.2
       const squashX = isGround ? 1.25 : 0.9
       const squashY = isGround ? 0.75 : 1.1
-      
-      // Rotación en el aire para dar sensación de inercia
       const rot = Math.cos(cycle) * -25 * p.dir * faceScale
-
       return `scaleX(${faceScale * squashX}) scaleY(${squashY}) translateY(${jumpY}px) rotate(${rot}deg)`
     }
     case 'punch': {
-      // Caminar y soltar golpes secos
       const speedMult = 3.5
       const cycle = (t * speedMult) % 2
       let punchDist = 0
       let rot = 0
       let sX = 1, sY = 1
-      
-      // Golpe ultrarrápido (0.15s relativos)
       if (cycle < 0.2) {
         const prog = cycle / 0.2
         const extension = Math.sin(prog * Math.PI)
@@ -201,14 +152,10 @@ function getTransform(p: Particle): string {
         sX = 1 + extension * 0.25
         sY = 1 - extension * 0.1
       }
-      
-      // Pequeño balanceo al caminar
       const bob = Math.abs(Math.sin(t * speedMult * 1.5)) * -3
-
       return `translateY(${bob}px) scaleX(${faceScale * sX}) scaleY(${sY}) translateX(${punchDist}px) rotate(${rot}deg)`
     }
     case 'breathe': {
-      // Flotación meditativa super fluida
       const floatY = Math.sin(t * 1.5) * 15
       const floatX = Math.cos(t * 1.1) * 8
       const scale = 1 + Math.sin(t * 2.2) * 0.08
@@ -216,19 +163,15 @@ function getTransform(p: Particle): string {
       return `translate(${floatX}px, ${floatY}px) scaleX(${faceScale}) scale(${scale}) rotate(${rot}deg)`
     }
     case 'spin': {
-      // Pelotas botando y girando según velocidad
       const rot = t * p.vx * 25
       const bounce = Math.abs(Math.sin(t * Math.abs(p.vx) * 0.3)) * -30
-      // Squash al rebotar
       const cycle = (t * Math.abs(p.vx) * 0.3) % Math.PI
       const isGround = cycle < 0.15 || cycle > Math.PI - 0.15
       const squashX = isGround ? 1.2 : 0.95
       const squashY = isGround ? 0.8 : 1.05
-      
       return `translateY(${bounce}px) rotate(${rot}deg) scaleX(${squashX}) scaleY(${squashY})`
     }
     case 'throw': {
-      // Objetos arrojados dando vueltas ultrarrápidas
       const rot = t * 350 * p.dir
       const floatY = Math.sin(t * Math.abs(p.vx) * 0.4) * 10
       return `translateY(${floatY}px) rotate(${rot}deg)`
@@ -244,8 +187,18 @@ export default function BackgroundParticles() {
   const rafRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
   const spawnTimerRef = useRef<number>(0)
+  
+  // Para el efecto parallax con el ratón
+  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 })
 
   useEffect(() => {
+    // Escuchar el ratón para el parallax hiperfluido
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current.targetX = (e.clientX / window.innerWidth - 0.5) * 60
+      mouseRef.current.targetY = (e.clientY / window.innerHeight - 0.5) * 60
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+
     const container = containerRef.current
     if (!container) return
 
@@ -253,25 +206,26 @@ export default function BackgroundParticles() {
       const el = document.createElement('span')
       el.dataset.id = String(p.id)
       el.textContent = p.def.emoji
-      el.style.cssText = `
+      // Efecto Glow para que destaquen como en un videojuego
+      el.style.cssText = \`
         position: absolute;
-        font-size: ${p.def.baseSize}rem;
-        left: ${p.x}vw;
-        top: ${p.y}vh;
+        font-size: \${p.def.baseSize}rem;
+        left: \${p.x}vw;
+        top: \${p.y}vh;
         opacity: 0;
         pointer-events: none;
         user-select: none;
         will-change: transform, opacity;
         line-height: 1;
         display: block;
-      `
+        filter: drop-shadow(0px 8px 16px rgba(34, 197, 94, 0.4));
+      \`
       container.appendChild(el)
     }
 
     const getEl = (id: number) =>
-      container.querySelector(`[data-id="${id}"]`) as HTMLSpanElement | null
+      container.querySelector(\`[data-id="\${id}"]\`) as HTMLSpanElement | null
 
-    // 2 partículas iniciales
     for (let i = 0; i < 2; i++) {
       const p = spawnParticle()
       p.x = 15 + Math.random() * 70
@@ -295,6 +249,10 @@ export default function BackgroundParticles() {
         createEl(p)
       }
 
+      // Suavizado del movimiento del ratón para el Parallax
+      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05
+      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05
+
       const toRemove: number[] = []
 
       for (const p of particlesRef.current) {
@@ -312,16 +270,20 @@ export default function BackgroundParticles() {
           p.opacity = Math.max(p.opacity - dt * 0.5, 0)
           if (p.opacity <= 0) toRemove.push(p.id)
         }
-        if (p.x < -20 || p.x > 120 || p.y < -20 || p.y > 120) p.phase = 'fadeout'
+        if (p.x < -25 || p.x > 125 || p.y < -25 || p.y > 125) p.phase = 'fadeout'
 
         const el = getEl(p.id)
         if (el) {
           const isDark = document.documentElement.classList.contains('dark')
-          const displayOpacity = isDark ? p.opacity : Math.min(p.opacity * 2.8, 0.85)
-          el.style.left = `${p.x}vw`
-          el.style.top = `${p.y}vh`
+          const displayOpacity = isDark ? p.opacity : Math.min(p.opacity * 3.5, 0.95)
+          el.style.left = \`\${p.x}vw\`
+          el.style.top = \`\${p.y}vh\`
           el.style.opacity = String(Math.round(displayOpacity * 1000) / 1000)
-          el.style.transform = getTransform(p)
+          
+          // Combinar parallax de cámara + transformación base de la física
+          const pX = mouseRef.current.x * (p.def.baseSize * 0.4)
+          const pY = mouseRef.current.y * (p.def.baseSize * 0.4)
+          el.style.transform = \`translate(\${pX}px, \${pY}px) \${getTransform(p)}\`
         }
       }
 
@@ -339,6 +301,7 @@ export default function BackgroundParticles() {
     rafRef.current = requestAnimationFrame(tick)
 
     return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
       cancelAnimationFrame(rafRef.current)
       if (container) container.innerHTML = ''
       particlesRef.current = []
@@ -346,11 +309,31 @@ export default function BackgroundParticles() {
   }, [])
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 pointer-events-none overflow-hidden"
-      style={{ zIndex: 0 }}
-      aria-hidden
-    />
+    <div className="fixed inset-0 pointer-events-none overflow-hidden flex items-center justify-center" style={{ zIndex: 0 }} aria-hidden>
+      
+      {/* ─── AURORAS DINÁMICAS (Orbes de color flotantes) ─── */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] sm:w-[45vw] sm:h-[45vw] rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[90px] opacity-40 dark:opacity-[0.15] animate-blob bg-brand-400 dark:bg-brand-500" />
+      <div className="absolute top-[20%] right-[-10%] w-[55vw] h-[55vw] sm:w-[40vw] sm:h-[40vw] rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[90px] opacity-40 dark:opacity-[0.15] animate-blob animation-delay-2000 bg-emerald-300 dark:bg-emerald-600" />
+      <div className="absolute bottom-[-20%] left-[20%] w-[70vw] h-[70vw] sm:w-[50vw] sm:h-[50vw] rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[90px] opacity-40 dark:opacity-[0.15] animate-blob animation-delay-4000 bg-cyan-300 dark:bg-cyan-900" />
+
+      {/* ─── TYPOGRAPHY KINÉTICA DE FONDO (Estilo Gymshark/Nike) ─── */}
+      <div className="absolute inset-0 flex flex-col justify-center gap-12 sm:gap-20 opacity-60 dark:opacity-[0.15] transform -rotate-[12deg] scale-[1.35] select-none">
+        <div className="kinetic-text">
+          TRAIN HARD • BEAST MODE • NO EXCUSES • LEVEL UP • OVERCOME • TRAIN HARD • BEAST MODE • NO EXCUSES • LEVEL UP • OVERCOME
+        </div>
+        <div className="kinetic-text reverse">
+          TRUST THE PROCESS • STAY CONSISTENT • GAIN STRENGTH • PACGYM • TRUST THE PROCESS • STAY CONSISTENT • GAIN STRENGTH • PACGYM
+        </div>
+        <div className="kinetic-text">
+          MASTER YOUR BODY • FOCUS • DISCIPLINE • HYPERTROPHY • MASTER YOUR BODY • FOCUS • DISCIPLINE • HYPERTROPHY
+        </div>
+        <div className="kinetic-text reverse">
+          ONE MORE REP • KEEP PUSHING • ENDURANCE • NEVER SURRENDER • ONE MORE REP • KEEP PUSHING • ENDURANCE • NEVER SURRENDER
+        </div>
+      </div>
+
+      {/* Contenedor de las partículas físicas interactivas */}
+      <div ref={containerRef} className="absolute inset-0" />
+    </div>
   )
 }
