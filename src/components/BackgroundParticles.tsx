@@ -88,8 +88,8 @@ const ICON_DEFS: IconDef[] = [
   { emoji: '🏌️', behavior: 'breathe', baseSize: 2.2, nativeDir: -1 },
 ]
 
-const MAX_PARTICLES = 4
-const SPAWN_INTERVAL = 3.2
+const MAX_PARTICLES = 6
+const SPAWN_INTERVAL = 2.5
 
 interface Particle {
   id: number
@@ -119,30 +119,36 @@ function spawnParticle(): Particle {
   if (needsHorizontal) {
     const fromLeft = Math.random() > 0.5
     dir = fromLeft ? 1 : -1
-    x = fromLeft ? -10 : 110
-    y = 15 + Math.random() * 65
-    const speed = def.behavior === 'run'
-      ? (5 + Math.random() * 6)
-      : (2.5 + Math.random() * 3.5)
+    x = fromLeft ? -15 : 115
+    y = 10 + Math.random() * 75
+
+    let speed = 3
+    if (def.behavior === 'run') speed = 8 + Math.random() * 8
+    else if (def.behavior === 'jump') speed = 6 + Math.random() * 6
+    else if (def.behavior === 'throw') speed = 12 + Math.random() * 10
+    else if (def.behavior === 'punch') speed = 3.5 + Math.random() * 3
+    else if (def.behavior === 'breathe') speed = 1.5 + Math.random() * 2
+
     vx = dir * speed
-    vy = (Math.random() - 0.5) * 0.8
+    // vy suave para que no vayan perfectamente rectos
+    vy = (Math.random() - 0.5) * (speed * 0.2)
   } else {
     // spin → desde cualquier borde
     const edge = Math.floor(Math.random() * 4)
-    const speed = 4 + Math.random() * 5
-    if (edge === 0) { x = 15 + Math.random() * 70; y = -10; vx = (Math.random() - 0.5) * speed * 0.4; vy = speed * 0.7 }
-    else if (edge === 1) { x = 110; y = 15 + Math.random() * 70; vx = -speed * 0.7; vy = (Math.random() - 0.5) * speed * 0.3 }
-    else if (edge === 2) { x = 15 + Math.random() * 70; y = 110; vx = (Math.random() - 0.5) * speed * 0.4; vy = -speed * 0.7 }
-    else { x = -10; y = 15 + Math.random() * 70; vx = speed * 0.7; vy = (Math.random() - 0.5) * speed * 0.3 }
+    const speed = 7 + Math.random() * 8
+    if (edge === 0) { x = Math.random() * 100; y = -15; vx = (Math.random() - 0.5) * speed; vy = speed * 0.8 }
+    else if (edge === 1) { x = 115; y = Math.random() * 100; vx = -speed * 0.8; vy = (Math.random() - 0.5) * speed }
+    else if (edge === 2) { x = Math.random() * 100; y = 115; vx = (Math.random() - 0.5) * speed; vy = -speed * 0.8 }
+    else { x = -15; y = Math.random() * 100; vx = speed * 0.8; vy = (Math.random() - 0.5) * speed }
     dir = vx >= 0 ? 1 : -1
   }
 
   return {
     id: idCounter++, def, x, y, vx, vy, dir,
-    age: 0, lifetime: 6 + Math.random() * 7,
+    age: 0, lifetime: 10 + Math.random() * 15,
     phase: 'fadein', opacity: 0,
-    targetOpacity: 0.13 + Math.random() * 0.09,
-    animTime: Math.random() * Math.PI * 2,
+    targetOpacity: 0.12 + Math.random() * 0.08,
+    animTime: Math.random() * 100,
   }
 }
 
@@ -151,52 +157,81 @@ function getTransform(p: Particle): string {
   const { nativeDir } = p.def
 
   // scaleX que hay que aplicar para que mire hacia donde va:
-  // si va a la derecha (dir=1) y mira a la derecha (nativeDir=1) → scaleX(1)
-  // si va a la izquierda (dir=-1) y mira a la derecha (nativeDir=1) → scaleX(-1)
-  // si va a la derecha (dir=1) y mira a la izquierda (nativeDir=-1) → scaleX(-1)
-  // si va a la izquierda (dir=-1) y mira a la izquierda (nativeDir=-1) → scaleX(1)
   const faceScale = p.dir === nativeDir ? 1 : -1
 
   switch (p.def.behavior) {
     case 'run': {
-      const bob = Math.sin(t * 7) * 2.5
-      return `translateY(${bob}px) scaleX(${faceScale})`
+      // Salto rápido de carrera, inclinación hacia adelante
+      const speedMult = Math.abs(p.vx) * 0.8
+      const bob = Math.abs(Math.sin(t * speedMult)) * -6
+      const lean = 12 * p.dir * faceScale // Inclinación hacia adelante
+      const rock = Math.sin(t * speedMult) * 8
+      return `scaleX(${faceScale}) translateY(${bob}px) rotate(${lean + rock}deg)`
     }
     case 'jump': {
-      const cycle = t % 1.6
-      const jumpY = -Math.abs(Math.sin((cycle / 1.6) * Math.PI)) * 22
-      const atGround = cycle < 0.08 || cycle > 1.52
-      const squashX = atGround ? 1.12 : 1
-      const squashY = atGround ? 0.88 : 1
-      return `translateY(${jumpY}px) scaleX(${faceScale * squashX}) scaleY(${squashY})`
+      // Trayectoria de saltos continuos (parkour)
+      const speedMult = Math.abs(p.vx) * 0.5
+      const cycle = (t * speedMult) % Math.PI
+      const jumpY = -Math.sin(cycle) * 45 // Arco del salto
+      
+      // Squash & stretch al tocar el suelo
+      const isGround = cycle < 0.2 || cycle > Math.PI - 0.2
+      const squashX = isGround ? 1.25 : 0.9
+      const squashY = isGround ? 0.75 : 1.1
+      
+      // Rotación en el aire para dar sensación de inercia
+      const rot = Math.cos(cycle) * -25 * p.dir * faceScale
+
+      return `scaleX(${faceScale * squashX}) scaleY(${squashY}) translateY(${jumpY}px) rotate(${rot}deg)`
     }
     case 'punch': {
-      const cycle = t % 1.8
-      let extraScaleX = 1, scaleY = 1
-      if (cycle < 0.12) {
-        const prog = cycle / 0.12
-        const punch = 1 + Math.sin(prog * Math.PI) * 0.45
-        extraScaleX = punch
-        scaleY = 1 / punch
+      // Caminar y soltar golpes secos
+      const speedMult = 3.5
+      const cycle = (t * speedMult) % 2
+      let punchDist = 0
+      let rot = 0
+      let sX = 1, sY = 1
+      
+      // Golpe ultrarrápido (0.15s relativos)
+      if (cycle < 0.2) {
+        const prog = cycle / 0.2
+        const extension = Math.sin(prog * Math.PI)
+        punchDist = extension * 18 * faceScale
+        rot = extension * 25 * p.dir * faceScale
+        sX = 1 + extension * 0.25
+        sY = 1 - extension * 0.1
       }
-      return `scaleX(${faceScale * extraScaleX}) scaleY(${scaleY})`
+      
+      // Pequeño balanceo al caminar
+      const bob = Math.abs(Math.sin(t * speedMult * 1.5)) * -3
+
+      return `translateY(${bob}px) scaleX(${faceScale * sX}) scaleY(${sY}) translateX(${punchDist}px) rotate(${rot}deg)`
     }
     case 'breathe': {
-      const scale = 1 + Math.sin(t * 0.7) * 0.07
-      const floatY = Math.sin(t * 0.45) * 9
-      return `translateY(${floatY}px) scaleX(${faceScale}) scale(${scale})`
+      // Flotación meditativa super fluida
+      const floatY = Math.sin(t * 1.5) * 15
+      const floatX = Math.cos(t * 1.1) * 8
+      const scale = 1 + Math.sin(t * 2.2) * 0.08
+      const rot = Math.sin(t * 0.8) * 5
+      return `translate(${floatX}px, ${floatY}px) scaleX(${faceScale}) scale(${scale}) rotate(${rot}deg)`
     }
     case 'spin': {
-      // Pelotas: giran sin importar dirección
-      const rot = t * 80
-      const scale = 1 + Math.sin(t * 1.8) * 0.1
-      return `rotate(${rot}deg) scale(${scale})`
+      // Pelotas botando y girando según velocidad
+      const rot = t * p.vx * 25
+      const bounce = Math.abs(Math.sin(t * Math.abs(p.vx) * 0.3)) * -30
+      // Squash al rebotar
+      const cycle = (t * Math.abs(p.vx) * 0.3) % Math.PI
+      const isGround = cycle < 0.15 || cycle > Math.PI - 0.15
+      const squashX = isGround ? 1.2 : 0.95
+      const squashY = isGround ? 0.8 : 1.05
+      
+      return `translateY(${bounce}px) rotate(${rot}deg) scaleX(${squashX}) scaleY(${squashY})`
     }
     case 'throw': {
-      // Objetos: wobble angular, sin flip de cara
-      const rot = Math.sin(t * 2.5) * 18
-      const scale = 1 + Math.sin(t * 3) * 0.08
-      return `rotate(${rot}deg) scale(${scale})`
+      // Objetos arrojados dando vueltas ultrarrápidas
+      const rot = t * 350 * p.dir
+      const floatY = Math.sin(t * Math.abs(p.vx) * 0.4) * 10
+      return `translateY(${floatY}px) rotate(${rot}deg)`
     }
     default:
       return `scaleX(${faceScale})`
