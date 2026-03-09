@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import ThemeToggle from '@/components/ThemeToggle'
 import type { ClientProfile, ClientGoal, TrainingLocation, FitnessLevel, DayOfWeek } from '@/types'
 
 const STEPS = [
@@ -183,7 +184,7 @@ export default function StartPage() {
   // ─── FASE: Formulario ─────────────────────────────────────────────────────
   // Layout: h-screen flex flex-col → header fijo arriba + form scrollable + botones fijos abajo
   return (
-    <div className="h-[100dvh] flex flex-col px-4 max-w-xl mx-auto pt-16 pb-6 sm:pt-16">
+    <div className="h-[100dvh] flex flex-col px-4 max-w-xl mx-auto pt-4 pb-6">
 
       {/* Header compacto — fijo arriba */}
       <div className="pb-2 flex-shrink-0">
@@ -194,7 +195,10 @@ export default function StartPage() {
               PAC<span className="text-brand-400">GYM</span>
             </span>
           </div>
-          <span className="text-xs text-slate-600 dark:text-slate-500">Paso {step}/{STEPS.length}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-600 dark:text-slate-500">Paso {step}/{STEPS.length}</span>
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Progress bar */}

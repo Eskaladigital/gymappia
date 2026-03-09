@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import ThemeToggle from '@/components/ThemeToggle'
 import type { ClientProfile, ClientGoal, TrainingLocation, FitnessLevel, DayOfWeek } from '@/types'
 
 const STEPS = [
@@ -76,12 +77,15 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] px-4 pt-16 pb-8 max-w-xl mx-auto">
+    <div className="min-h-[100dvh] px-4 pt-4 pb-8 max-w-xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <button onClick={() => router.back()} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm mb-4 flex items-center gap-2">
-          ← Volver
-        </button>
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={() => router.back()} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm flex items-center gap-2">
+            ← Volver
+          </button>
+          <ThemeToggle />
+        </div>
         <h1 className="text-2xl font-black text-slate-900 dark:text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
           Nuevo cliente
         </h1>

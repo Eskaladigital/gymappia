@@ -206,25 +206,12 @@ export default function BackgroundParticles() {
       const el = document.createElement('span')
       el.dataset.id = String(p.id)
       el.textContent = p.def.emoji
-      // Efecto Glow para que destaquen como en un videojuego
-      el.style.cssText = \`
-        position: absolute;
-        font-size: \${p.def.baseSize}rem;
-        left: \${p.x}vw;
-        top: \${p.y}vh;
-        opacity: 0;
-        pointer-events: none;
-        user-select: none;
-        will-change: transform, opacity;
-        line-height: 1;
-        display: block;
-        filter: drop-shadow(0px 8px 16px rgba(34, 197, 94, 0.4));
-      \`
+      el.style.cssText = `position:absolute;font-size:${p.def.baseSize}rem;left:${p.x}vw;top:${p.y}vh;opacity:0;pointer-events:none;user-select:none;will-change:transform,opacity;line-height:1;display:block;filter:drop-shadow(0px 8px 16px rgba(34,197,94,0.4));`
       container.appendChild(el)
     }
 
     const getEl = (id: number) =>
-      container.querySelector(\`[data-id="\${id}"]\`) as HTMLSpanElement | null
+      container.querySelector(`[data-id="${id}"]`) as HTMLSpanElement | null
 
     for (let i = 0; i < 2; i++) {
       const p = spawnParticle()
@@ -276,14 +263,14 @@ export default function BackgroundParticles() {
         if (el) {
           const isDark = document.documentElement.classList.contains('dark')
           const displayOpacity = isDark ? p.opacity : Math.min(p.opacity * 3.5, 0.95)
-          el.style.left = \`\${p.x}vw\`
-          el.style.top = \`\${p.y}vh\`
+          el.style.left = `${p.x}vw`
+          el.style.top = `${p.y}vh`
           el.style.opacity = String(Math.round(displayOpacity * 1000) / 1000)
           
           // Combinar parallax de cámara + transformación base de la física
           const pX = mouseRef.current.x * (p.def.baseSize * 0.4)
           const pY = mouseRef.current.y * (p.def.baseSize * 0.4)
-          el.style.transform = \`translate(\${pX}px, \${pY}px) \${getTransform(p)}\`
+          el.style.transform = `translate(${pX}px, ${pY}px) ${getTransform(p)}`
         }
       }
 

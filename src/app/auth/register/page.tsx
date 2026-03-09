@@ -51,7 +51,7 @@ function RegisterContent() {
   }
 
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center px-4 py-16">
+    <div className="min-h-[100dvh] flex items-center justify-center px-4 py-6">
       <div className="max-w-sm w-full animate-fadeInUp">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-2">
