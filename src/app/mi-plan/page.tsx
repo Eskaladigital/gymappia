@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -8,11 +8,37 @@ import type { TrainingPlan, ClientProfile, UserStats, WorkoutDay, SessionLog } f
 import MonthlyCalendar from '@/components/MonthlyCalendar'
 import { DIA_ABBREV, DIA_LABEL } from '@/lib/utils'
 
+import confetti from 'canvas-confetti'
+
 const DIAS_ORDER = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
 
 function estKcal(pesoKg: number, duracionMin: number, sensacion: number): number {
   const MET = [0, 2.5, 3, 3.5, 4, 5][sensacion] || 4
   return Math.round(MET * pesoKg * (duracionMin / 60))
+}
+
+const playBeep = (freq: number, type: OscillatorType, duration: number, vol: number = 0.1) => {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = type
+    osc.frequency.setValueAtTime(freq, ctx.currentTime)
+    gain.gain.setValueAtTime(vol, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start()
+    osc.stop(ctx.currentTime + duration)
+  } catch (e) {}
+}
+
+const playTick = () => playBeep(600, 'sine', 0.1)
+const playEnd = () => playBeep(1000, 'square', 0.4, 0.2)
+const playSuccessDing = () => {
+  playBeep(400, 'sine', 0.1, 0.1)
+  setTimeout(() => playBeep(600, 'sine', 0.15, 0.1), 100)
+  setTimeout(() => playBeep(1000, 'sine', 0.2, 0.1), 250)
 }
 
 type DayStatus = 'done' | 'today' | 'upcoming' | 'rest'
@@ -45,12 +71,47 @@ function MiPlanContent() {
   const [liveExIdx, setLiveExIdx] = useState(0)
   const [liveSet, setLiveSet] = useState(1)
   const [restSeconds, setRestSeconds] = useState(0)
+  const [initialRestSeconds, setInitialRestSeconds] = useState(0)
   // Vista del calendario: semanal o mensual
   const [calView, setCalView] = useState<'semanal' | 'mensual'>('semanal')
+  const [exerciseWeights, setExerciseWeights] = useState<Record<string, string>>({})
+  const wakeLockRef = useRef<any>(null)
 
   useEffect(() => {
     loadData()
+    // Cargar pesos guardados en local
+    const saved = localStorage.getItem('pacgym_weights')
+    if (saved) {
+      try { setExerciseWeights(JSON.parse(saved)) } catch(e){}
+    }
   }, [])
+
+  const saveWeight = (exerciseName: string, weight: string) => {
+    const updated = { ...exerciseWeights, [exerciseName]: weight }
+    setExerciseWeights(updated)
+    localStorage.setItem('pacgym_weights', JSON.stringify(updated))
+  }
+
+  // Wake Lock API para que no se apague la pantalla en Live Mode
+  const requestWakeLock = async () => {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLockRef.current = await navigator.wakeLock.request('screen')
+      }
+    } catch (err) {}
+  }
+  const releaseWakeLock = () => {
+    if (wakeLockRef.current) {
+      wakeLockRef.current.release()
+      wakeLockRef.current = null
+    }
+  }
+
+  useEffect(() => {
+    if (liveMode) requestWakeLock()
+    else releaseWakeLock()
+    return () => releaseWakeLock()
+  }, [liveMode])
 
   useEffect(() => {
     if (justRegistered && !sessionStorage.getItem('pacgym_welcome_seen')) {
@@ -159,8 +220,26 @@ function MiPlanContent() {
       racha_7: { icon: '🔥', label: 'Semana perfecta' },
       sesiones_10: { icon: '⚡', label: 'En marcha' },
     }
+    
+    playSuccessDing()
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#22c55e', '#ffffff', '#fbbf24']
+    })
+
     if (logrosNuevos.length > 0 && LOGRO_INFO[logrosNuevos[0]]) {
-      setLogroParaCompartir(LOGRO_INFO[logrosNuevos[0]])
+      setTimeout(() => {
+        setLogroParaCompartir(LOGRO_INFO[logrosNuevos[0]])
+        playSuccessDing()
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.5 },
+          colors: ['#eab308', '#f59e0b', '#fcd34d']
+        })
+      }, 1000)
     }
 
     await supabase.from('user_stats').update({
@@ -212,6 +291,7 @@ function MiPlanContent() {
     if (livePhase === 'work') {
       setLivePhase('rest')
       setRestSeconds(ej.descanso_seg)
+      setInitialRestSeconds(ej.descanso_seg)
     } else {
       if (liveSet >= totalSets) {
         if (liveExIdx >= selectedDay.ejercicios.length - 1) {
@@ -232,6 +312,8 @@ function MiPlanContent() {
     if (!liveMode || livePhase !== 'rest' || restSeconds <= 0) return
     const t = setInterval(() => {
       setRestSeconds(s => {
+        if (s === 4 || s === 3 || s === 2) playTick()
+        if (s === 1) playEnd()
         if (s <= 1) { advanceLivePhase(); return 0 }
         return s - 1
       })
@@ -581,6 +663,19 @@ function MiPlanContent() {
                       <p className="text-xs text-slate-600 dark:text-slate-500">⏸ {ej.descanso_seg}s</p>
                     </div>
                   </div>
+                  
+                  {/* Registro de pesos */}
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="text-xs text-slate-500">Peso usado:</span>
+                    <input
+                      type="text"
+                      placeholder="Ej: 60kg o 20kg/lado"
+                      value={exerciseWeights[ej.nombre] || ''}
+                      onChange={e => saveWeight(ej.nombre, e.target.value)}
+                      className="flex-1 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg px-2 py-1 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
+
                   <div className="mt-2 flex gap-3">
                     <button onClick={() => openVideoDemo(ej.nombre)}
                       className="flex items-center gap-1.5 text-xs text-brand-400 hover:text-brand-300 transition-colors">
@@ -692,12 +787,31 @@ function MiPlanContent() {
               </button>
             </>
           ) : (
-            <>
-              <p className="text-slate-600 dark:text-slate-500 text-sm mb-2">Descanso</p>
-              <p className="text-7xl font-black text-brand-400 mb-4">{restSeconds}</p>
-              <p className="text-slate-500 text-sm">siguiente serie en...</p>
-              <button onClick={advanceLivePhase} className="mt-6 text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm">Saltar descanso →</button>
-            </>
+            <div className="flex flex-col items-center">
+              <p className="text-slate-600 dark:text-slate-500 text-sm mb-6">Descanso</p>
+              
+              {/* Circular Timer */}
+              <div className="relative w-48 h-48 flex items-center justify-center mb-6">
+                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" className="text-white/10" strokeWidth="6" />
+                  <circle
+                    cx="50" cy="50" r="45" fill="none" stroke="currentColor"
+                    className="text-brand-500 transition-all duration-1000 ease-linear" strokeWidth="6"
+                    strokeDasharray="282.74"
+                    strokeDashoffset={282.74 * (1 - restSeconds / Math.max(initialRestSeconds, 1))}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="text-center z-10">
+                  <p className="text-6xl font-black text-brand-400 leading-none">{restSeconds}</p>
+                  <p className="text-xs text-slate-500 mt-1">seg</p>
+                </div>
+              </div>
+
+              <p className="text-slate-500 text-sm mb-2 text-center">siguiente serie:<br/><strong className="text-white">{selectedDay.ejercicios[liveExIdx]?.nombre}</strong></p>
+              
+              <button onClick={advanceLivePhase} className="mt-6 text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm py-2 px-4 rounded-xl border border-white/10">Saltar descanso →</button>
+            </div>
           )}
         </div>
       )}
