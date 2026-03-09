@@ -11,7 +11,7 @@ export default function ThemeToggleOrFixed() {
   if (hasTopNav) return null
 
   return (
-    <div className="fixed top-4 right-4 z-30">
+    <div className="fixed top-4 right-4 z-50">
       <ThemeToggle />
     </div>
   )

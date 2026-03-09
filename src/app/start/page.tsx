@@ -84,7 +84,7 @@ export default function StartPage() {
   // ─── FASE: Loading ────────────────────────────────────────────────────────
   if (phase === 'loading') {
     return (
-      <div className="h-screen flex flex-col items-center justify-center px-4">
+      <div className="h-[100dvh] flex flex-col items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
           <div className="relative mb-6">
             <div className="w-20 h-20 mx-auto rounded-full bg-brand-500/20 border-2 border-brand-500/50 flex items-center justify-center animate-pulse">
@@ -123,7 +123,7 @@ export default function StartPage() {
   // ─── FASE: Done ───────────────────────────────────────────────────────────
   if (phase === 'done') {
     return (
-      <div className="h-screen flex flex-col items-center justify-center px-4 overflow-y-auto py-4">
+      <div className="h-[100dvh] flex flex-col items-center justify-center px-4 overflow-y-auto py-12">
         <div className="max-w-md w-full text-center animate-fadeInUp">
           <div className="w-20 h-20 mx-auto rounded-full bg-brand-500/20 border-2 border-brand-500 flex items-center justify-center mb-4 animate-pulse-green">
             <span className="text-3xl">✅</span>
@@ -183,10 +183,10 @@ export default function StartPage() {
   // ─── FASE: Formulario ─────────────────────────────────────────────────────
   // Layout: h-screen flex flex-col → header fijo arriba + form scrollable + botones fijos abajo
   return (
-    <div className="h-screen flex flex-col px-4 max-w-xl mx-auto">
+    <div className="h-[100dvh] flex flex-col px-4 max-w-xl mx-auto pt-16 pb-6 sm:pt-16">
 
       {/* Header compacto — fijo arriba */}
-      <div className="pt-4 pb-2 flex-shrink-0">
+      <div className="pb-2 flex-shrink-0">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-1.5">
             <span className="text-lg">💪</span>
@@ -427,7 +427,7 @@ export default function StartPage() {
       </div>
 
       {/* Botones navegación — fijos abajo */}
-      <div className="flex gap-3 py-3 flex-shrink-0">
+      <div className="flex gap-3 pt-3 pb-8 sm:pb-6 flex-shrink-0">
         {step > 1 && (
           <button onClick={() => setStep(s => s - 1)}
             className="flex-1 py-3 glass hover:bg-slate-100/50 dark:hover:bg-white/10 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-all">

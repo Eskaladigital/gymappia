@@ -9,7 +9,7 @@ function VerificaContent() {
   const email = params.get('email') || ''
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-[100dvh] flex items-center justify-center px-4 py-16">
       <div className="max-w-sm w-full animate-fadeInUp text-center">
         <div className="text-5xl mb-6">📧</div>
         <h2 className="text-2xl font-black mb-2 text-slate-900 dark:text-white">Revisa tu correo</h2>

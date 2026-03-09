@@ -76,7 +76,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen px-4 py-8 max-w-xl mx-auto">
+    <div className="min-h-[100dvh] px-4 pt-16 pb-8 max-w-xl mx-auto">
       {/* Header */}
       <div className="mb-8">
         <button onClick={() => router.back()} className="text-slate-600 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white text-sm mb-4 flex items-center gap-2">
@@ -347,7 +347,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Navigation buttons */}
-      <div className="flex gap-3 mt-6">
+      <div className="flex gap-3 mt-6 pb-6">
         {step > 1 && (
           <button onClick={() => setStep(s => s - 1)}
             className="flex-1 py-3 glass hover:bg-slate-100/50 dark:hover:bg-white/10 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 transition-all">
